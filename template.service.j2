@@ -1,0 +1,29 @@
+{{if .Status}} <font color="info">[成功] </font>{{ .title}} {{- else}}<font color="warning">[失败] </font> {{ .title}}  {{- end}} 
+> 服务名称：<font color="comment">{{.serviceName}}</font> 
+流水线名称：<font color="comment">{{.pipelineName}}</font> 
+流水线ID：<font color="comment">{{.pipelineId}}</font> 
+流水线地址：<font color="comment">{{.pipelineUrl}}</font> 
+构建分支：<font color="comment">{{.branch}}</font> 
+阶段：<font color="comment">{{.stage}}</font> 
+构建人：<font color="comment">{{.user}}</font> 
+COMMITID：<font color="comment">{{.tags}}</font> 
+COMMITINFO: <font color="comment">{{.info}}</font> 
+
+{{range $e := .alerts}}
+## {{if eq $e.status "firing"}} [<font color="warning">{{$e.labels.severity}}</font>] {{ $e.labels.node}} [监控详情]({{$e.generatorURL}})
+
+>> 告警阈值: <font color="warning">{{$e.labels.threshold_value}}</font> 
+当前数值: <font color="warning">{{$e.annotations.current_value}}</font> 
+开始时间: <font color="comment">{{$e.startsAt}}</font> 
+结束时间: <font color="comment">{{$e.endsAt}}</font> 
+
+{{- else}}# [<font color="info">{{$e.labels.severity}}</font>] {{ $e.labels.node}} [监控详情]({{$e.generatorURL}})
+
+>> 告警阈值: <font color="info">{{$e.labels.threshold_value}}</font> 
+当前数值: <font color="info">{{$e.annotations.current_value}}</font> 
+开始时间: <font color="comment">{{$e.startsAt}}</font> 
+结束时间: <font color="comment">{{$e.endsAt}}</font> 
+
+{{- end}}
+
+{{end}}
