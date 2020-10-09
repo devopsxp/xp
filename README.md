@@ -73,8 +73,10 @@ xp is my name,but this project is look like ansible-playbook and pipeline togeth
 - [x] 各个步骤的计时器和总执行计时
 - [ ] 容器化
   - [ ] docker support
-    - [ ] local kubelet server
+    - [ ] yaml新增images字段
+    - [ ] [Remote API](https://docs.docker.com/engine/api/v1.24/)
   - [ ] k8s support
+    - [ ] yaml新增k8s字段
     - [ ] k8s agent/operator
   - [ ] ssh + docker support
 
