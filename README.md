@@ -71,6 +71,12 @@ xp is my name,but this project is look like ansible-playbook and pipeline togeth
 - [x] module plugin插件机制
 - [ ] ssh [连接功能](https://github.com/mojocn/felix)
 - [x] 各个步骤的计时器和总执行计时
+- [ ] 容器化
+  - [ ] docker support
+    - [ ] local kubelet server
+  - [ ] k8s support
+    - [ ] k8s agent/operator
+  - [ ] ssh + docker support
 
 
 # Useage
