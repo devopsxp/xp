@@ -3,6 +3,7 @@ package module
 import (
 	"reflect"
 	"sync"
+	"time"
 
 	. "github.com/devopsxp/xp/plugin"
 	"github.com/devopsxp/xp/utils"
@@ -76,16 +77,18 @@ func (l *LocalYamlInput) Start() {
 
 	var wg sync.WaitGroup
 
+	log.Info("LocalYaml Input 插件开始执行ssh目标主机状态扫描，并发数： 10")
 	for n, i := range ips {
 		wg.Add(1)
 		go func(ip string, num int) {
 			defer wg.Done()
 			checkchan <- ip
+			now := time.Now()
 			if utils.ScanPort(ip, "22") {
-				log.Infof("%d: Ssh check %s success", num, ip)
+				log.Infof("%d: Ssh check %s success 耗时: %v", num, ip, time.Now().Sub(now))
 				l.SetConnectStatus(ip, "success")
 			} else {
-				log.Infof("%d: Ssh check %s failed", num, ip)
+				log.Infof("%d: Ssh check %s failed 耗时：%v", num, ip, time.Now().Sub(now))
 				l.SetConnectStatus(ip, "failed")
 			}
 			<-checkchan

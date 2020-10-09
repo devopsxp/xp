@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"time"
 
 	. "github.com/devopsxp/xp/plugin"
 	"github.com/devopsxp/xp/utils"
@@ -89,6 +90,7 @@ func (r *ShellRole) Run() error {
 				"Shell": r.shell,
 				"Stage": r.stage,
 				"User":  r.remote_user,
+				"耗时":    time.Now().Sub(r.starttime),
 			}).Errorln(err.Error())
 			r.logs[fmt.Sprintf("%s %s %s", r.stage, r.host, r.name)] = err.Error()
 			if strings.Contains(err.Error(), "ssh:") {
@@ -102,6 +104,7 @@ func (r *ShellRole) Run() error {
 				"Shell": r.shell,
 				"Stage": r.stage,
 				"User":  r.remote_user,
+				"耗时":    time.Now().Sub(r.starttime),
 			}).Info(rs)
 			r.logs[fmt.Sprintf("%s %s %s", r.stage, r.host, r.name)] = rs
 		}
@@ -123,6 +126,7 @@ func (r *ShellRole) Run() error {
 					"Shell": cmd,
 					"Stage": r.stage,
 					"User":  r.remote_user,
+					"耗时":    time.Now().Sub(r.starttime),
 				}).Errorln(err.Error())
 				r.logs[fmt.Sprintf("%s %s %s", r.stage, r.host, r.name)] = err.Error()
 				if strings.Contains(err.Error(), "ssh:") {
@@ -136,6 +140,7 @@ func (r *ShellRole) Run() error {
 					"Shell": cmd,
 					"Stage": r.stage,
 					"User":  r.remote_user,
+					"耗时":    time.Now().Sub(r.starttime),
 				}).Info(rs)
 				r.logs[fmt.Sprintf("%s %s %s", r.stage, r.host, r.name)] = rs
 			}
@@ -147,6 +152,8 @@ OVER:
 
 // 处理返回日志
 func (r *ShellRole) After() {
+	stoptime := time.Now()
+	r.logs["耗时"] = fmt.Sprintf("%v", stoptime.Sub(r.starttime))
 	r.msg.CallBack[fmt.Sprintf("%s-%s-%s", r.host, r.stage, r.name)] = r.logs
 }
 

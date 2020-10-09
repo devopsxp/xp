@@ -1,6 +1,8 @@
 package pipeline
 
 import (
+	"time"
+
 	"github.com/devopsxp/xp/plugin"
 	log "github.com/sirupsen/logrus"
 )
@@ -48,6 +50,7 @@ func (p *PipeConfig) WithOutputName(name string) *PipeConfig {
 // 对于插件化的系统，一切皆是插件，因此将pipeline也设计成一个插件，实现plugin接口
 // pipeline管道的定义
 type Pipeline struct {
+	start  time.Time // 计时器
 	status plugin.StatusPlugin
 	check  plugin.Check
 	input  plugin.Input
@@ -83,6 +86,7 @@ func (p *Pipeline) Stop() {
 	p.output.Stop()
 	p.status = plugin.Stopped
 	log.Debugln("Pipeline stopped.")
+	log.Infof("Pipeline执行完毕，耗时：%v", time.Now().Sub(p.start))
 }
 
 func (p *Pipeline) Status() plugin.StatusPlugin {
@@ -90,6 +94,7 @@ func (p *Pipeline) Status() plugin.StatusPlugin {
 }
 
 func (p *Pipeline) Init() {
+	p.start = time.Now()
 	// p.check.Init()
 	p.input.Init()
 	p.filter.Init()

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"strings"
+	"time"
 
 	. "github.com/devopsxp/xp/plugin"
 	"github.com/devopsxp/xp/utils"
@@ -102,6 +103,7 @@ func (r *TemplateRole) Run() error {
 			"dest":     r.dest,
 			"Stage":    r.stage,
 			"User":     r.remote_user,
+			"耗时":       time.Now().Sub(r.starttime),
 		}).Errorln(err.Error())
 		r.logs[fmt.Sprintf("%s %s %s", r.stage, r.host, r.name)] = err.Error()
 		if strings.Contains(err.Error(), "ssh:") {
@@ -116,6 +118,7 @@ func (r *TemplateRole) Run() error {
 			"dest":     r.dest,
 			"Stage":    r.stage,
 			"User":     r.remote_user,
+			"耗时":       time.Now().Sub(r.starttime),
 		}).Infof("模板上传成功 %s", r.dest)
 		r.logs[fmt.Sprintf("%s %s %s", r.stage, r.host, r.name)] = fmt.Sprintf("模板上传成功 %s", r.dest)
 	}
@@ -125,5 +128,7 @@ func (r *TemplateRole) Run() error {
 
 // 处理返回日志
 func (r *TemplateRole) After() {
+	stoptime := time.Now()
+	r.logs["耗时"] = fmt.Sprintf("%v", stoptime.Sub(r.starttime))
 	r.msg.CallBack[fmt.Sprintf("%s-%s-%s", r.host, r.stage, r.name)] = r.logs
 }

@@ -1,6 +1,8 @@
 package module
 
 import (
+	"time"
+
 	. "github.com/devopsxp/xp/plugin"
 	log "github.com/sirupsen/logrus"
 )
@@ -30,15 +32,18 @@ type hook struct {
 	HookMethod
 	Type   string
 	Target string
+	start  time.Time // 计时器
 }
 
 func (h *hook) Send(msg *Message) {
+	h.start = time.Now()
 	switch h.Type {
 	case "console":
 		log.Printf("console hook send %v\n", msg.Data.Check)
 		for k, v := range msg.CallBack {
 			log.Warnln(k, v)
 		}
+		log.Warnf("console日志耗时：%v", time.Now().Sub(h.start))
 	default:
 		log.Debugln("email hook send")
 		status := h.IsCurrent()
@@ -52,6 +57,7 @@ func (h *hook) Send(msg *Message) {
 				log.Warnln(rs)
 			}
 		}
+		log.Warnf("%s 发送耗时：%v", h.Type, time.Now().Sub(h.start))
 	}
 }
 

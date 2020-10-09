@@ -70,6 +70,7 @@ xp is my name,but this project is look like ansible-playbook and pipeline togeth
 - [ ] module man模块说明文档
 - [x] module plugin插件机制
 - [ ] ssh [连接功能](https://github.com/mojocn/felix)
+- [x] 各个步骤的计时器和总执行计时
 
 
 # Useage
@@ -87,9 +88,7 @@ cli -> main.go -> root.go -> test.go -> pipeline -> init -> start -> check(ssh) 
 
 # Module
 
-## Check Plugin
-
-- [x] ssh
+`Remove Check Plugin`
 
 ## Input Plugin
 
@@ -98,6 +97,7 @@ cli -> main.go -> root.go -> test.go -> pipeline -> init -> start -> check(ssh) 
 ## Filter Plugin
 
 - [x] shell
+- [x] ssh
 
 ## Output Plugin
 

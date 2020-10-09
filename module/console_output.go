@@ -26,6 +26,7 @@ func (c *ConsoleOutput) Send(msgs *Message) {
 
 	// log.Printf("Output:\n\tHeader: %+v, Body: %+v\n", msgs.Data.Raw, msgs.Data.Target)
 	// c.SetType("console").SetTarget("stdout").Send(msgs)
+	log.Info("ConsoleOutput Output 插件开始执行目标主机，并发数： 1")
 
 	// 全局动态变量
 	var vars map[string]interface{}
