@@ -10,10 +10,7 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
-	"os"
 	"time"
-
-	log "github.com/sirupsen/logrus"
 )
 
 // 发送GET请求
@@ -48,13 +45,12 @@ func Get(url string) (response []byte, err error) {
 // 发送POST请求
 // url:请求地址，data:POST请求提交的数据,contentType:请求体格式，如：application/json
 // content:请求放回的内容
-func Post(url string, data interface{}, contentType string) (result []byte) {
+func Post(url string, data interface{}, contentType string) (result []byte, err error) {
 	jsonStr, _ := json.Marshal(data)
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonStr))
 	req.Header.Add("content-type", contentType)
 	if err != nil {
-		log.Errorln(err)
-		os.Exit(1)
+		return
 	}
 	defer req.Body.Close()
 
@@ -63,8 +59,7 @@ func Post(url string, data interface{}, contentType string) (result []byte) {
 	client := &http.Client{Timeout: 5 * time.Second}
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Errorln(err)
-		os.Exit(1)
+		return
 	}
 	defer resp.Body.Close()
 

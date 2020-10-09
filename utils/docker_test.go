@@ -8,9 +8,10 @@ func TestDockerListContainers(t *testing.T) {
 	host := "127.0.0.1"
 	port := "9999"
 	version := "v1.24"
-	rs, err := DockerListContainers(host, port, version)
+	cli := NewDockerCLI(host, port, version)
+	rs, err := cli.ListContainers()
 	if err != nil {
-		t.Errorf("DockerListContainers() return an error: %v", err)
+		t.Errorf("ListContainers() return an error: %v", err)
 	}
 
 	for _, container := range rs.([]interface{}) {
