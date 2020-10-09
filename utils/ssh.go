@@ -134,7 +134,7 @@ func (c *Cli) SftpUploadTemplateString(data, remotepath string) error {
 
 	dstFile, err := c.sftpClient.Create(remotepath)
 	if err != nil {
-		log.Errorln("创建文件 %s 失败: %s", remotepath, err.Error())
+		log.Errorf("创建文件 %s 失败: %s", remotepath, err.Error())
 		return err
 	}
 	defer dstFile.Close()
@@ -167,7 +167,7 @@ func (c *Cli) SftpUploadToRemote(localpath, remotepath string) error {
 
 	dstFile, err := c.sftpClient.Create(remotepath)
 	if err != nil {
-		log.Errorln("创建文件 %s 失败: %s", remotepath, err.Error())
+		log.Errorf("创建文件 %s 失败: %s", remotepath, err.Error())
 		return err
 	}
 	defer dstFile.Close()
@@ -181,7 +181,7 @@ func (c *Cli) SftpUploadToRemote(localpath, remotepath string) error {
 				log.Debug("已读取到文件末尾")
 				break
 			} else {
-				log.Debug("读取文件出错 %v", err)
+				log.Debugf("读取文件出错 %v", err)
 				return err
 			}
 		}

@@ -10,19 +10,24 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"time"
+
+	log "github.com/sirupsen/logrus"
 )
 
-//发送GET请求
-//url:请求地址
-//response:请求返回的内容
-func Get(url string) (response string) {
+// 发送GET请求
+// url:请求地址
+// response:请求返回的内容
+func Get(url string) (response []byte, err error) {
 	client := http.Client{Timeout: 5 * time.Second}
-	resp, error := client.Get(url)
+	resp, err := client.Get(url)
 	defer resp.Body.Close()
-	if error != nil {
-		panic(error)
+	if err != nil {
+		return response, err
 	}
+
+	resp.Header.Set("Content-Type", "application/json")
 
 	var buffer [512]byte
 	result := bytes.NewBuffer(nil)
@@ -32,34 +37,37 @@ func Get(url string) (response string) {
 		if err != nil && err == io.EOF {
 			break
 		} else if err != nil {
-			panic(err)
+			return response, err
 		}
 	}
 
-	response = result.String()
+	response = result.Bytes()
 	return
 }
 
-//发送POST请求
-//url:请求地址，data:POST请求提交的数据,contentType:请求体格式，如：application/json
-//content:请求放回的内容
-func Post(url string, data interface{}, contentType string) (content string) {
+// 发送POST请求
+// url:请求地址，data:POST请求提交的数据,contentType:请求体格式，如：application/json
+// content:请求放回的内容
+func Post(url string, data interface{}, contentType string) (result []byte) {
 	jsonStr, _ := json.Marshal(data)
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonStr))
 	req.Header.Add("content-type", contentType)
 	if err != nil {
-		panic(err)
+		log.Errorln(err)
+		os.Exit(1)
 	}
 	defer req.Body.Close()
 
+	req.Header.Set("Content-Type", "application/json")
+
 	client := &http.Client{Timeout: 5 * time.Second}
-	resp, error := client.Do(req)
-	if error != nil {
-		panic(error)
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Errorln(err)
+		os.Exit(1)
 	}
 	defer resp.Body.Close()
 
-	result, _ := ioutil.ReadAll(resp.Body)
-	content = string(result)
+	result, _ = ioutil.ReadAll(resp.Body)
 	return
 }
