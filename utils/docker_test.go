@@ -160,32 +160,32 @@ func TestCreateContainer(t *testing.T) {
 			"VolumesFrom":      []string{}, // ["parent", "other:ro"],
 			"CapAdd":           []string{"NET_ADMIN"},
 			"CapDrop":          []string{"MKNOD"},
-			"GroupAdd":         []string{"newgroup"},
-			"RestartPolicy":    map[string]interface{}{"Name": "", "MaximumRetryCount": 0},
-			"NetworkMode":      "bridge",
-			"Devices":          []string{},
-			"Sysctls":          map[string]string{"net.ipv4.ip_forward": "1"},
-			"Ulimits":          []map[string]string{},
-			"LogConfig":        map[string]interface{}{"Type": "json-file", "Config": map[string]string{}},
-			"SecurityOpt":      []string{},
+			// "GroupAdd":         []string{"newgroup"},
+			"RestartPolicy": map[string]interface{}{"Name": "", "MaximumRetryCount": 0},
+			"NetworkMode":   "bridge",
+			"Devices":       []string{},
+			"Sysctls":       map[string]string{"net.ipv4.ip_forward": "1"},
+			"Ulimits":       []map[string]string{},
+			"LogConfig":     map[string]interface{}{"Type": "json-file", "Config": map[string]string{}},
+			"SecurityOpt":   []string{},
 			// "StorageOpt":           map[string]string{},
 			"CgroupParent": "",
 			"VolumeDriver": "",
 			"ShmSize":      67108864,
 		},
-		"NetworkingConfig": map[string]interface{}{
-			"EndpointsConfig": map[string]interface{}{
-				"isolated_nw": map[string]interface{}{
-					"IPAMConfig": map[string]interface{}{
-						"IPv4Address":  "172.20.30.33",
-						"IPv6Address":  "2001:db8:abcd::3033",
-						"LinkLocalIPs": []string{"169.254.34.68", "fe80::3468"},
-					},
-					"Links":   []string{"container_1", "container_2"},
-					"Aliases": []string{"server_x", "server_y"},
-				},
-			},
-		},
+		// "NetworkingConfig": map[string]interface{}{
+		// 	"EndpointsConfig": map[string]interface{}{
+		// 		"isolated_nw": map[string]interface{}{
+		// 			"IPAMConfig": map[string]interface{}{
+		// 				"IPv4Address":  "172.20.30.33",
+		// 				"IPv6Address":  "2001:db8:abcd::3033",
+		// 				"LinkLocalIPs": []string{"169.254.34.68", "fe80::3468"},
+		// 			},
+		// 			"Links":   []string{"container_1", "container_2"},
+		// 			"Aliases": []string{"server_x", "server_y"},
+		// 		},
+		// 	},
+		// },
 	}
 	cli := NewDockerCLI(host, port, "")
 	rs, err := cli.CreateContainer(data)

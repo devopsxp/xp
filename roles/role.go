@@ -43,14 +43,15 @@ func ExecRole(role RoleLifeCycle, hook func(string, string) error) error {
 
 // 处理config module适配
 func NewShellRole(stage, user, host string, vars map[string]interface{}, configs []interface{}, msg *Message) error {
-	for _, config := range configs {
+	for n, config := range configs {
+		log.Debugf("当前步骤: %d 当前Stage: %s Config信息: %v", n, stage, config)
 		// 判断是否含有shell模块
 		if _, ok := config.(map[interface{}]interface{})["shell"]; ok {
 			sr := &ShellRole{}
 			err := sr.Init(stage, user, host, vars, config.(map[interface{}]interface{}), msg)
 			if err != nil {
 				// 判断是stage不匹配还是其它错误
-				if strings.Contains(err.Error(), "not equal") {
+				if strings.Contains(err.Error(), "not equal") || strings.Contains(err.Error(), "不在可执行主机范围内") {
 					log.Debugf("%s %v", host, err)
 				} else {
 					return err
@@ -65,7 +66,7 @@ func NewShellRole(stage, user, host string, vars map[string]interface{}, configs
 			copys := &CopyRole{}
 			err := copys.Init(stage, user, host, vars, config.(map[interface{}]interface{}), msg)
 			if err != nil {
-				if strings.Contains(err.Error(), "not equal") {
+				if strings.Contains(err.Error(), "not equal") || strings.Contains(err.Error(), "不在可执行主机范围内") {
 					log.Debugf("%s %v", host, err)
 				} else {
 					return err
@@ -80,13 +81,28 @@ func NewShellRole(stage, user, host string, vars map[string]interface{}, configs
 			template := &TemplateRole{}
 			err := template.Init(stage, user, host, vars, config.(map[interface{}]interface{}), msg)
 			if err != nil {
-				if strings.Contains(err.Error(), "not equal") {
+				if strings.Contains(err.Error(), "not equal") || strings.Contains(err.Error(), "不在可执行主机范围内") {
 					log.Debugf("%s %v", host, err)
 				} else {
 					return err
 				}
 			} else {
 				err = ExecRole(template, nil)
+				if err != nil {
+					return err
+				}
+			}
+		} else if _, ok := config.(map[interface{}]interface{})["image"]; ok {
+			docker := &DockerRole{}
+			err := docker.Init(stage, user, host, vars, config.(map[interface{}]interface{}), msg)
+			if err != nil {
+				if strings.Contains(err.Error(), "not equal") || strings.Contains(err.Error(), "不在可执行主机范围内") {
+					log.Debugf("%s %v", host, err)
+				} else {
+					return err
+				}
+			} else {
+				err = ExecRole(docker, nil)
 				if err != nil {
 					return err
 				}

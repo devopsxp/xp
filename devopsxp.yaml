@@ -1,6 +1,6 @@
 host: # 目标主机
   - 127.0.0.1
-  - 192.168.0.1-255
+  # - 192.168.0.1-20
 remote_user: root 
 roles: # 执行具体stage
   - build
@@ -39,57 +39,57 @@ vars: # 环境变量
         threshold_value: 88
 hooks: # 消息发送 全局一个 可以一次发送所有结果到多个渠道
   - type: console # 类型，支持：console|email|wechat|phone|sms
-  - type: email
-    alias: xp战队 # 邮箱昵称
-    email_user: "xp@xp.com"
-    email_pwd: "******"
-    email_smtp: "smtp.exmail.qq.com"
-    email_smtp_port: "465"
-    email_to:
-      - xp@xp.com
-    template: # 告警模板
-      title: "告警title"
-      text: "{{.Status}} {{.title}}
-      {{range $key,$value := .logs}}
-        {{range $k,$v := $value}}
-        ------ {{$k}} {{$v}}<br/>
-        {{end}}
-      {{end}}"
-      path: template.service.j2
-      vars: # 内置固定参数
-        Status: true
-        title: "模板测试"
-        serviceName: "xp"
-  - type: wechat
-    address:
-      - https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=******
-    template: # 告警模板
-      text: '
-# 告警模板
+#   - type: email
+#     alias: xp战队 # 邮箱昵称
+#     email_user: "xp@xp.com"
+#     email_pwd: "******"
+#     email_smtp: "smtp.exmail.qq.com"
+#     email_smtp_port: "465"
+#     email_to:
+#       - xp@xp.com
+#     template: # 告警模板
+#       title: "告警title"
+#       text: "{{.Status}} {{.title}}
+#       {{range $key,$value := .logs}}
+#         {{range $k,$v := $value}}
+#         ------ {{$k}} {{$v}}<br/>
+#         {{end}}
+#       {{end}}"
+#       path: template.service.j2
+#       vars: # 内置固定参数
+#         Status: true
+#         title: "模板测试"
+#         serviceName: "xp"
+#   - type: wechat
+#     address:
+#       - https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=******
+#     template: # 告警模板
+#       text: '
+# # 告警模板
 
-{{if .Status}} <font color=\"info\">[成功] </font>{{ .title}} {{- else}}<font color=\"warning\">[失败] </font> {{ .title}}  {{- end}} 
+# {{if .Status}} <font color=\"info\">[成功] </font>{{ .title}} {{- else}}<font color=\"warning\">[失败] </font> {{ .title}}  {{- end}} 
 
-> 服务名称：<font color="comment">{{.serviceName}}</font> 
-> 流水线名称：<font color="comment">{{.pipelineName}}</font> 
-> 流水线ID：<font color="comment">{{.pipelineId}}</font> 
-> 流水线地址：<font color="comment">{{.pipelineUrl}}</font> 
-> 构建分支：<font color="comment">{{.branch}}</font> 
-> 阶段：<font color="comment">{{.stage}}</font> 
-> 构建人：<font color="comment">{{.user}}</font> 
-> COMMIT: <font color="comment">{{.info}}</font> 
-> COMMITID：<font color="comment">{{.tags}}</font>
+# > 服务名称：<font color="comment">{{.serviceName}}</font> 
+# > 流水线名称：<font color="comment">{{.pipelineName}}</font> 
+# > 流水线ID：<font color="comment">{{.pipelineId}}</font> 
+# > 流水线地址：<font color="comment">{{.pipelineUrl}}</font> 
+# > 构建分支：<font color="comment">{{.branch}}</font> 
+# > 阶段：<font color="comment">{{.stage}}</font> 
+# > 构建人：<font color="comment">{{.user}}</font> 
+# > COMMIT: <font color="comment">{{.info}}</font> 
+# > COMMITID：<font color="comment">{{.tags}}</font>
 
-# {{.title}}
+# # {{.title}}
 
-{{range $key,$value := .logs}}
-{{range $k,$v := $value}}
-> {{$k}} {{$v}}
-{{end}}
-{{end}}'
-      path: template.service.j2
-      vars: # 内置固定参数
-        title: "模板测试"
-        serviceName: "xp"
+# {{range $key,$value := .logs}}
+# {{range $k,$v := $value}}
+# > {{$k}} {{$v}}
+# {{end}}
+# {{end}}'
+#       path: template.service.j2
+#       vars: # 内置固定参数
+#         title: "模板测试"
+#         serviceName: "xp"
   - type: phone
   - type: sms
 stage: # 流程步骤
@@ -131,3 +131,12 @@ config: # 详细配置信息
   - stage: test
     name: 查看docker信息
     shell: systemctl status sshd
+  - stage: test
+    name: docker image执行测试
+    image: ubuntu
+    script:
+      - date
+      - pwd
+      - hostname
+    tags:
+      - 127.0.0.1
