@@ -44,7 +44,6 @@ type Input interface {
 	Receive() *Message
 }
 
-// TODO: Process如何传值
 // 过滤插件，用于处理消息
 type Filter interface {
 	Plugin
