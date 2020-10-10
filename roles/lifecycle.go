@@ -20,6 +20,7 @@ type RoleLC struct {
 // 准备环节
 func (r *RoleLC) Pre() {
 	log.Debugf("Role module %s Pre running.", r.name)
+	// 设置开始时间
 	r.starttime = time.Now()
 }
 
