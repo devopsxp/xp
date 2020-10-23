@@ -3,20 +3,23 @@ package roles
 import (
 	"errors"
 	"fmt"
+	"reflect"
 	"strings"
 	"time"
 
-	. "github.com/devopsxp/xp/plugin"
 	"github.com/devopsxp/xp/utils"
 	log "github.com/sirupsen/logrus"
 )
 
+func init() {
+	// 初始化shell role插件映射关系表
+	addRoles(ShellType, reflect.TypeOf(ShellRole{}))
+}
+
 type ShellRole struct {
 	RoleLC
-	shell string // 原生命令
-	msg   *Message
-	logs  map[string]string // 命令执行日志
-	items []string          // 多命令集合
+	shell string   // 原生命令
+	items []string // 多命令集合
 }
 
 // 准备数据
@@ -26,53 +29,23 @@ type ShellRole struct {
 // @Param vars 动态参数
 // @Param configs 执行模块内容
 // @Param msg 消息结构体
-func (r *ShellRole) Init(stage, user, host string, vars map[string]interface{}, data map[interface{}]interface{}, msg *Message) error {
-	if current_stage, ok := data["stage"]; !ok {
-		return errors.New("config 无 stage字段")
-	} else {
-		if stage != current_stage.(string) {
-			return errors.New(fmt.Sprintf("stage not equal %s %d != %s %d", stage, len(stage), current_stage, len(current_stage.(string))))
-		}
+func (r *ShellRole) Init(args *RoleArgs) error {
+	err := r.Common(args)
+	if err != nil {
+		return err
 	}
 
-	r.logs = make(map[string]string)
-	r.msg = msg
-	r.remote_user = user
-	r.stage = stage
-	r.vars = vars
-
-	r.host = host
-
 	// 获取原始shell命令
-	r.shell = data["shell"].(string)
+	r.shell = args.currentConfig["shell"].(string)
 
 	// 获取name
-	r.name = data["name"].(string)
+	r.name = args.currentConfig["name"].(string)
 
 	// 获取with_items迭代
-	if item, ok := data["with_items"]; ok {
+	if item, ok := args.currentConfig["with_items"]; ok {
 		for _, it := range item.([]interface{}) {
 			r.items = append(r.items, it.(string))
 		}
-	}
-
-	// 是否在可执行主机范围内
-	isTags := false
-
-	// 获取tags目标执行主机
-	if tags, ok := data["tags"]; ok {
-		for _, tag := range tags.([]interface{}) {
-			if host == tag.(string) {
-				isTags = true
-			}
-		}
-	} else {
-		// 没有设置tags标签，表示不限制主机执行
-		isTags = true
-	}
-
-	if !isTags {
-		return errors.New(fmt.Sprintf("Stage: %s Name: %s Host: %s 不在可执行主机范围内，退出！", stage, r.name, host))
 	}
 
 	return nil

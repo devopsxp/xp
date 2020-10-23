@@ -82,7 +82,7 @@ func (s *ShellFilter) Process(msgs *Message) *Message {
 				// 判断stage是否允许执行
 				if roles.IsRolesAllow(stage.(string), rolesData) {
 					// 3. TODO: 解析yaml中shell的模块，然后进行匹配
-					err := roles.NewShellRole(stage.(string), remote_user, host, vars, configs, msgs)
+					err := roles.NewShellRole(roles.NewRoleArgs(stage.(string), remote_user, host, vars, configs, msgs, nil))
 					if err != nil {
 						log.Errorln(err.Error())
 					}
