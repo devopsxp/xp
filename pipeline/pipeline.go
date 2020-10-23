@@ -9,11 +9,12 @@ import (
 
 // Pipeline Config
 type PipeConfig struct {
-	Name   string
-	Check  plugin.Config
-	Input  plugin.Config
-	Filter plugin.Config
-	Output plugin.Config
+	Name    string
+	TmpArgs interface{} // 临时变量插入
+	Check   plugin.Config
+	Input   plugin.Config
+	Filter  plugin.Config
+	Output  plugin.Config
 }
 
 // Pipeline Config 工厂模式
@@ -25,6 +26,12 @@ func DefaultPipeConfig(name string) *PipeConfig {
 		Filter: plugin.Config{PluginTypes: plugin.FilterType},
 		Output: plugin.Config{PluginTypes: plugin.OutputType},
 	}
+}
+
+// 设置临时变量
+func (p *PipeConfig) SetArgs(data interface{}) *PipeConfig {
+	p.TmpArgs = data
+	return p
 }
 
 func (p *PipeConfig) WithCheckName(name string) *PipeConfig {
@@ -50,18 +57,19 @@ func (p *PipeConfig) WithOutputName(name string) *PipeConfig {
 // 对于插件化的系统，一切皆是插件，因此将pipeline也设计成一个插件，实现plugin接口
 // pipeline管道的定义
 type Pipeline struct {
-	start  time.Time // 计时器
-	status plugin.StatusPlugin
-	check  plugin.Check
-	input  plugin.Input
-	filter plugin.Filter
-	output plugin.Output
+	start   time.Time // 计时器
+	status  plugin.StatusPlugin
+	check   plugin.Check
+	input   plugin.Input
+	filter  plugin.Filter
+	output  plugin.Output
+	tmpargs interface{}
 }
 
 // 一个消息的处理流程 check -> input -> filter -> output
 func (p *Pipeline) Exec() {
 	// msg := p.check.Conn()
-	msg := p.input.Receive()
+	msg := p.input.Receive(p.tmpargs)
 	if msg.Status == plugin.Ok {
 		msg = p.filter.Process(msg)
 	}
@@ -114,6 +122,9 @@ func factoryOf(t plugin.PluginType) plugin.Factory {
 // pipeline工厂方法，根据配置创建一个Pipeline实例
 func Of(conf PipeConfig) *Pipeline {
 	p := &Pipeline{}
+	if conf.TmpArgs != nil {
+		p.tmpargs = conf.TmpArgs
+	}
 	// p.check = factoryOf(plugin.CheckType).Create(conf.Check).(plugin.Check)
 	p.input = factoryOf(plugin.InputType).Create(conf.Input).(plugin.Input)
 	p.filter = factoryOf(plugin.FilterType).Create(conf.Filter).(plugin.Filter)

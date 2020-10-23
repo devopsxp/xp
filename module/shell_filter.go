@@ -28,7 +28,6 @@ func (s *ShellFilter) Process(msgs *Message) *Message {
 
 	// TODO:
 	// 1. 封装config shell|copy|template等操作
-	// 2.
 	log.Info("ShellFilter Filter 插件开始执行目标主机Config Playbook，并发数： 1")
 
 	// 解析yaml结果

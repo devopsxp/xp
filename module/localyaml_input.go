@@ -35,6 +35,7 @@ type LocalYaml struct {
 
 func (l *LocalYaml) Get() {
 	l.data = viper.AllSettings()
+	log.Debugf("所有配置： %v", l.data)
 }
 
 type LocalYamlInput struct {
@@ -45,7 +46,7 @@ type LocalYamlInput struct {
 	lock       sync.RWMutex
 }
 
-func (l *LocalYamlInput) Receive() *Message {
+func (l *LocalYamlInput) Receive(data interface{}) *Message {
 	l.yaml.Get()
 
 	if l.status != Started {

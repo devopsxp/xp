@@ -41,7 +41,7 @@ type Check interface {
 // 输入插件，用于接收消息，解析内容
 type Input interface {
 	Plugin
-	Receive() *Message
+	Receive(interface{}) *Message
 }
 
 // 过滤插件，用于处理消息

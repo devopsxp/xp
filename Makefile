@@ -10,5 +10,8 @@ log:
 build:
 	go build && ./xp -h
 
+help:
+	go run main.go -h
+
 config:
 	go build && ./xp config
