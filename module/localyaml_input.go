@@ -2,6 +2,7 @@ package module
 
 import (
 	"reflect"
+	"runtime"
 	"sync"
 	"time"
 
@@ -46,7 +47,7 @@ type LocalYamlInput struct {
 	lock       sync.RWMutex
 }
 
-func (l *LocalYamlInput) Receive(data interface{}) *Message {
+func (l *LocalYamlInput) Receive() *Message {
 	l.yaml.Get()
 
 	if l.status != Started {
@@ -74,7 +75,7 @@ func (l *LocalYamlInput) Start() {
 	}
 
 	// 目标主机22端口检测并发限制
-	checkchan := make(chan string, 10)
+	checkchan := make(chan string, runtime.NumCPU())
 
 	var wg sync.WaitGroup
 
@@ -100,7 +101,7 @@ func (l *LocalYamlInput) Start() {
 }
 
 // LocalYamlInput的Init函数实现
-func (l *LocalYamlInput) Init() {
+func (l *LocalYamlInput) Init(data interface{}) {
 	l.yaml.data = make(map[string]interface{})
 	l.connecheck = make(map[string]string)
 	l.name = "LocalYaml Input"

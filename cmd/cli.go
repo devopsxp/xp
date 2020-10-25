@@ -17,6 +17,7 @@ package cmd
 
 import (
 	"github.com/devopsxp/xp/pipeline"
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -25,6 +26,7 @@ var (
 	shell  string // shell 命令
 	src    string // copy模块 src
 	dest   string // copy模块 dest
+	user   string // 远程用户
 )
 
 // cliCmd represents the cli command
@@ -33,14 +35,20 @@ var cliCmd = &cobra.Command{
 	Short: "命令行工具",
 	Long: `指定模块进行单项功能使用. For example:
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+copy 远程文件传输
+template 模板文件传输
+shell 远程shell命令执行`,
 	Run: func(cmd *cobra.Command, args []string) {
+		log.Debugf("Cli args: %v", args)
 		// TODO: 完成数据Message.Data模型拼装
 		data := map[string]interface{}{
-			"module": module,
-			"shell":  shell,
+			"host":        args,
+			"remote_user": user,
+			"roles":       []interface{}{"shell"}, // shell role and stage
+			"vars":        map[string]interface{}{},
+			"hooks":       []interface{}{map[interface{}]interface{}{"type": "console"}},
+			"stage":       []interface{}{"shell"},
+			"config":      []interface{}{map[interface{}]interface{}{"stage": "shell", "name": "Running", module: shell, "src": src, "dest": dest}},
 		}
 
 		config := pipeline.DefaultPipeConfig("cli").
@@ -71,4 +79,7 @@ func init() {
 
 	cliCmd.Flags().StringVarP(&module, "module", "m", "", "指定模块")
 	cliCmd.Flags().StringVarP(&shell, "shell", "a", "", "执行命令")
+	cliCmd.Flags().StringVarP(&src, "src", "S", "", "copy source路径")
+	cliCmd.Flags().StringVarP(&dest, "dest", "D", "", "dest 目标路径")
+	cliCmd.Flags().StringVarP(&user, "user", "u", "root", "远程主机执行用户，默认：root")
 }

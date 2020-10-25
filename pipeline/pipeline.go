@@ -69,7 +69,7 @@ type Pipeline struct {
 // 一个消息的处理流程 check -> input -> filter -> output
 func (p *Pipeline) Exec() {
 	// msg := p.check.Conn()
-	msg := p.input.Receive(p.tmpargs)
+	msg := p.input.Receive()
 	if msg.Status == plugin.Ok {
 		msg = p.filter.Process(msg)
 	}
@@ -104,9 +104,9 @@ func (p *Pipeline) Status() plugin.StatusPlugin {
 func (p *Pipeline) Init() {
 	p.start = time.Now()
 	// p.check.Init()
-	p.input.Init()
-	p.filter.Init()
-	p.output.Init()
+	p.input.Init(p.tmpargs)
+	p.filter.Init(p.tmpargs)
+	p.output.Init(p.tmpargs)
 }
 
 // 最后定义pipeline的工厂方法，调用plugin.Factory抽象工厂完成pipelien对象的实例化：
@@ -121,6 +121,7 @@ func factoryOf(t plugin.PluginType) plugin.Factory {
 
 // pipeline工厂方法，根据配置创建一个Pipeline实例
 func Of(conf PipeConfig) *Pipeline {
+	// 临时参数设置
 	p := &Pipeline{}
 	if conf.TmpArgs != nil {
 		p.tmpargs = conf.TmpArgs

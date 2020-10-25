@@ -1,13 +1,14 @@
 package module
 
 import (
+	"reflect"
+	"runtime"
 	"sync"
 	"time"
 
 	. "github.com/devopsxp/xp/plugin"
 	"github.com/devopsxp/xp/utils"
 	log "github.com/sirupsen/logrus"
-	"github.com/spf13/viper"
 )
 
 // 1. 获取cli参数
@@ -15,20 +16,25 @@ import (
 // 3. 拼装成Message.Data map[string]interface{}
 // 4. 执行pipeline
 
+func init() {
+	AddInput("cli", reflect.TypeOf(CliInput{}))
+}
+
 type CliInput struct {
 	LifeCycle
 	status       StatusPlugin
 	connectcheck map[string]string
 	lock         sync.RWMutex
+	data         map[string]interface{}
 }
 
-func (c *CliInput) Receive(data interface{}) *Message {
+func (c *CliInput) Receive() *Message {
 	if c.status != Started {
 		log.Warnln("LocalYaml input plugin is not running,input nothing.")
 		return nil
 	}
 
-	return Builder().WithInit().WithCheck(c.connectcheck).WithItemInterface(data.(map[string]interface{})).Build()
+	return Builder().WithInit().WithCheck(c.connectcheck).WithItemInterface(c.data).Build()
 }
 
 func (c *CliInput) SetConnectStatus(ip, status string) {
@@ -43,7 +49,7 @@ func (c *CliInput) Start() {
 
 	// Check all ipsl.yaml.
 	// TODO: error 没有viper取配置了
-	ips, err := getips(viper.GetStringSlice("host"))
+	ips, err := getips(c.data["host"].([]string))
 	if err != nil {
 		panic(err)
 	}
@@ -53,7 +59,7 @@ func (c *CliInput) Start() {
 
 	var wg sync.WaitGroup
 
-	log.Info("LocalYaml Input 插件开始执行ssh目标主机状态扫描，并发数： 10")
+	log.Infof("LocalYaml Input 插件开始执行ssh目标主机状态扫描，并发数： %d", runtime.NumCPU())
 	for n, i := range ips {
 		wg.Add(1)
 		go func(ip string, num int) {
@@ -75,7 +81,9 @@ func (c *CliInput) Start() {
 }
 
 // LocalYamlInput的Init函数实现
-func (c *CliInput) Init() {
+func (c *CliInput) Init(data interface{}) {
 	c.connectcheck = make(map[string]string)
 	c.name = "Cli Input"
+	// 配置cli
+	c.data = data.(map[string]interface{})
 }

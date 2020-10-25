@@ -1,8 +1,9 @@
 host: # 目标主机
   - 127.0.0.1
   # - 192.168.0.1-20
-remote_user: root 
+remote_user: lxp 
 roles: # 执行具体stage
+  - vim-go
   - build
   - test
 vars: # 环境变量
@@ -93,9 +94,15 @@ hooks: # 消息发送 全局一个 可以一次发送所有结果到多个渠道
   - type: phone
   - type: sms
 stage: # 流程步骤
+  - vim-go
   - build
   - test
 config: # 详细配置信息
+  - stage: vim-go
+    name: install vim-go plugin
+    shell: "{{ .item }}"
+    with_items:
+    - git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim 
   - stage: build
     name: template 模板测试
     template: 

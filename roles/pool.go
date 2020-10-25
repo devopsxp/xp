@@ -10,7 +10,7 @@ type RoleType string
 
 const (
 	CopyType     RoleType = "copy"
-	DockerType   RoleType = "docker"
+	DockerType   RoleType = "image"
 	K8sType      RoleType = "k8s"
 	ShellType    RoleType = "shell"
 	SwarmType    RoleType = "swarm"

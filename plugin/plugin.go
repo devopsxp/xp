@@ -29,7 +29,7 @@ type Plugin interface {
 	// 返回插件当前的运行状态
 	Status() StatusPlugin
 	// 新增初始化方法，在插件工厂返回实例前调用
-	Init()
+	Init(interface{})
 }
 
 // 检测插件，用于检测目标单位可执行状态
@@ -41,7 +41,7 @@ type Check interface {
 // 输入插件，用于接收消息，解析内容
 type Input interface {
 	Plugin
-	Receive(interface{}) *Message
+	Receive() *Message
 }
 
 // 过滤插件，用于处理消息

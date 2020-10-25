@@ -3,6 +3,7 @@ package module
 import (
 	"os"
 	"reflect"
+	"runtime"
 
 	. "github.com/devopsxp/xp/plugin"
 	"github.com/devopsxp/xp/roles"
@@ -28,7 +29,7 @@ func (s *ShellFilter) Process(msgs *Message) *Message {
 
 	// TODO:
 	// 1. 封装config shell|copy|template等操作
-	log.Info("ShellFilter Filter 插件开始执行目标主机Config Playbook，并发数： 1")
+	log.Infof("ShellFilter Filter 插件开始执行目标主机Config Playbook，并发数： %d", runtime.NumCPU())
 
 	// 解析yaml结果
 	log.Debugf("解析yaml结果 Check %v\n", msgs.Data.Check)
@@ -93,7 +94,7 @@ func (s *ShellFilter) Process(msgs *Message) *Message {
 	return msgs
 }
 
-func (s *ShellFilter) Init() {
+func (s *ShellFilter) Init(data interface{}) {
 	s.name = "Shell Filter"
 	s.status = Started
 }
