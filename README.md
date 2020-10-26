@@ -344,3 +344,5 @@ COMMITINFO: <font color="comment">{{.info}}</font>
   * inputPlugin
   * 匹配数据
   * pipeline
+2. cli module分离命令 [cobra add shell -p cliCmd]
+3. logours 格式标准化 [ansible]

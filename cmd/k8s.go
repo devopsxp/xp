@@ -16,29 +16,31 @@ limitations under the License.
 package cmd
 
 import (
+	"fmt"
+
 	"github.com/spf13/cobra"
 )
 
-// cliCmd represents the cli command
-var cliCmd = &cobra.Command{
-	Use:   "cli",
-	Short: "本地命令行工具",
-	Long:  `本地执行命令cli，类似ansible $host -m $module -a "$command"`,
-	// Run: func(cmd *cobra.Command, args []string) {
-	// 	fmt.Println("Useage: ./xp cli -h 查看使用帮助")
-	// },
+// k8sCmd represents the k8s command
+var k8sCmd = &cobra.Command{
+	Use:   "k8s",
+	Short: "基于k8s容器集群执行命令",
+	Long:  `结合远程主机+docker+k8s+容器执行+pipeline`,
+	Run: func(cmd *cobra.Command, args []string) {
+		fmt.Println("k8s called")
+	},
 }
 
 func init() {
-	rootCmd.AddCommand(cliCmd)
+	cliCmd.AddCommand(k8sCmd)
 
 	// Here you will define your flags and configuration settings.
 
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
-	// cliCmd.PersistentFlags().String("foo", "", "A help for foo")
+	// k8sCmd.PersistentFlags().String("foo", "", "A help for foo")
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
-	// cliCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	// k8sCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }

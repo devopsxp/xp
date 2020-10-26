@@ -18,7 +18,8 @@ func init() {
 // shell 命令运行filter插件
 type ShellFilter struct {
 	LifeCycle
-	status StatusPlugin
+	status    StatusPlugin
+	terminial bool
 }
 
 func (s *ShellFilter) Process(msgs *Message) *Message {
@@ -48,6 +49,11 @@ func (s *ShellFilter) Process(msgs *Message) *Message {
 		os.Exit(1)
 	}
 
+	// 解析terminial
+	if terminial, ok := msgs.Data.Items["terminial"]; ok {
+		s.terminial = terminial.(bool)
+	}
+
 	log.Debugf("Config %v\n", configs)
 	var remote_user string
 	if user, ok := msgs.Data.Items["remote_user"]; ok {
@@ -71,18 +77,12 @@ func (s *ShellFilter) Process(msgs *Message) *Message {
 		if status == "failed" {
 			log.Debugf("host %s is failed, next.\n", host)
 		} else {
-			// log.Printf("执行目标主机： %s\n", host)
-			// 按照stage顺序执行configs配置
-			if stages == nil {
-				log.Errorln("未配置stage模块，退出！")
-				os.Exit(1)
-			}
 
 			for _, stage := range stages {
 				// 判断stage是否允许执行
 				if roles.IsRolesAllow(stage.(string), rolesData) {
 					// 3. TODO: 解析yaml中shell的模块，然后进行匹配
-					err := roles.NewShellRole(roles.NewRoleArgs(stage.(string), remote_user, host, vars, configs, msgs, nil))
+					err := roles.NewShellRole(roles.NewRoleArgs(stage.(string), remote_user, host, vars, configs, msgs, nil, s.terminial))
 					if err != nil {
 						log.Errorln(err.Error())
 					}
@@ -97,4 +97,9 @@ func (s *ShellFilter) Process(msgs *Message) *Message {
 func (s *ShellFilter) Init(data interface{}) {
 	s.name = "Shell Filter"
 	s.status = Started
+	if data != nil {
+		if isterminial, ok := data.(map[string]interface{})["terminial"]; ok {
+			s.terminial = isterminial.(bool)
+		}
+	}
 }

@@ -67,6 +67,7 @@ func parseRoleType(config map[interface{}]interface{}) (rt RoleType, isok bool) 
 // @Params currentConfig 当前config
 // @Params msg pipeline消息传递 TODO: context替换，传递上下文
 // @Params hook 自定义config执行完的钩子函数
+// @Params isTerminial 是否terminial执行shell
 type RoleArgs struct {
 	stage, user, host string
 	vars              map[string]interface{}
@@ -74,17 +75,19 @@ type RoleArgs struct {
 	currentConfig     map[interface{}]interface{}
 	msg               *Message
 	hook              *Hook
+	isTerminial       bool
 }
 
-func NewRoleArgs(stage, user, host string, vars map[string]interface{}, configs []interface{}, msg *Message, hook *Hook) *RoleArgs {
+func NewRoleArgs(stage, user, host string, vars map[string]interface{}, configs []interface{}, msg *Message, hook *Hook, terminial bool) *RoleArgs {
 	return &RoleArgs{
-		stage:   stage,
-		user:    user,
-		host:    host,
-		vars:    vars,
-		configs: configs,
-		msg:     msg,
-		hook:    hook,
+		stage:       stage,
+		user:        user,
+		host:        host,
+		vars:        vars,
+		configs:     configs,
+		msg:         msg,
+		hook:        hook,
+		isTerminial: terminial,
 	}
 }
 

@@ -8,7 +8,7 @@ log:
 	go build && ./xp test -d -l --config  devopsxp.yaml
 
 cli:
-	go build && ./xp cli 127.0.0.1 192.168.50.1-255 -m shell -u lxp -a "hostname"
+	go build && ./xp cli shell 127.0.0.1 192.168.50.1-255 -u lxp -a "hostname"
 
 build:
 	go build && ./xp -h

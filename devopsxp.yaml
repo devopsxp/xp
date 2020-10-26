@@ -1,7 +1,8 @@
 host: # 目标主机
   - 127.0.0.1
   # - 192.168.0.1-20
-remote_user: xp 
+remote_user: lxp 
+terminial: false
 roles: # 执行具体stage
   - vim-go
   - build
@@ -91,8 +92,8 @@ hooks: # 消息发送 全局一个 可以一次发送所有结果到多个渠道
 #       vars: # 内置固定参数
 #         title: "模板测试"
 #         serviceName: "xp"
-  - type: phone
-  - type: sms
+  # - type: phone
+  # - type: sms
 stage: # 流程步骤
   - vim-go
   - build
@@ -131,10 +132,11 @@ config: # 详细配置信息
     - ip a|grep eth0
     - pwd
     - uname -a
+    - zsh
     - docker ps && 
       docker images
     tags:
-      - 192.168.0.250
+      - 127.0.0.1
   - stage: test
     name: 查看docker信息
     shell: systemctl status sshd

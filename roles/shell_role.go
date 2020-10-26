@@ -3,6 +3,7 @@ package roles
 import (
 	"errors"
 	"fmt"
+	"os"
 	"reflect"
 	"strings"
 	"time"
@@ -18,8 +19,9 @@ func init() {
 
 type ShellRole struct {
 	RoleLC
-	shell string   // 原生命令
-	items []string // 多命令集合
+	shell       string   // 原生命令
+	items       []string // 多命令集合
+	isTerminial bool     // 是否交互式执行
 }
 
 // 准备数据
@@ -34,6 +36,8 @@ func (r *ShellRole) Init(args *RoleArgs) error {
 	if err != nil {
 		return err
 	}
+
+	r.isTerminial = args.isTerminial
 
 	// 获取原始shell命令
 	r.shell = args.currentConfig["shell"].(string)
@@ -53,9 +57,19 @@ func (r *ShellRole) Init(args *RoleArgs) error {
 
 // 执行
 func (r *ShellRole) Run() error {
-	var err error
+	var (
+		err error
+		rs  string
+	)
 	if r.items == nil {
-		rs, err := utils.New(r.host, r.remote_user, "", 22).Run(r.shell)
+		cmd := fmt.Sprintf("bash -c \"%s\"", r.shell)
+		if r.isTerminial {
+			err = utils.New(r.host, r.remote_user, "", 22).RunTerminal(cmd, os.Stdout, os.Stderr)
+			rs = fmt.Sprintf("%s over", r.shell)
+		} else {
+			rs, err = utils.New(r.host, r.remote_user, "", 22).Run(cmd)
+		}
+
 		if err != nil {
 			log.WithFields(log.Fields{
 				"Host":  r.host,
@@ -91,7 +105,14 @@ func (r *ShellRole) Run() error {
 				panic(err)
 			}
 			log.Debugf("cmd is %s", cmd)
-			rs, err := utils.New(r.host, r.remote_user, "", 22).Run(cmd)
+
+			if r.isTerminial {
+				err = utils.New(r.host, r.remote_user, "", 22).RunTerminal(cmd, os.Stdout, os.Stderr)
+				rs = fmt.Sprintf("%s over", r.shell)
+			} else {
+				rs, err = utils.New(r.host, r.remote_user, "", 22).Run(cmd)
+			}
+
 			if err != nil {
 				log.WithFields(log.Fields{
 					"Host":  r.host,
