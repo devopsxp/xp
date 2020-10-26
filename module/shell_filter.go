@@ -69,7 +69,7 @@ func (s *ShellFilter) Process(msgs *Message) *Message {
 	// 2. 根据stage进行解析
 	for host, status := range msgs.Data.Check {
 		if status == "failed" {
-			log.Errorf("host %s is failed, next.\n", host)
+			log.Debugf("host %s is failed, next.\n", host)
 		} else {
 			// log.Printf("执行目标主机： %s\n", host)
 			// 按照stage顺序执行configs配置

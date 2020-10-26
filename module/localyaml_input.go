@@ -75,26 +75,30 @@ func (l *LocalYamlInput) Start() {
 	}
 
 	// 目标主机22端口检测并发限制
-	checkchan := make(chan string, runtime.NumCPU())
+	checkchan := make(chan string, 5*runtime.NumCPU())
 
 	var wg sync.WaitGroup
 
-	log.Info("LocalYaml Input 插件开始执行ssh目标主机状态扫描，并发数： 10")
+	log.Infof("LocalYaml Input 插件开始执行ssh目标主机状态扫描，并发数： %d", 5*runtime.NumCPU())
 	for n, i := range ips {
 		wg.Add(1)
+		checkchan <- i
 		go func(ip string, num int) {
 			defer wg.Done()
-			checkchan <- ip
 			now := time.Now()
 			if utils.ScanPort(ip, "22") {
 				log.Infof("%d: Ssh check %s success 耗时: %v", num, ip, time.Now().Sub(now))
 				l.SetConnectStatus(ip, "success")
 			} else {
-				log.Infof("%d: Ssh check %s failed 耗时：%v", num, ip, time.Now().Sub(now))
+				log.Debugf("%d: Ssh check %s failed 耗时：%v", num, ip, time.Now().Sub(now))
 				l.SetConnectStatus(ip, "failed")
 			}
 			<-checkchan
 		}(i, n)
+
+		if n%10 == 0 {
+			log.Infof("已完成 %d 主机连接测试, 当前GoRoutine数量: %d", n, runtime.NumGoroutine())
+		}
 	}
 
 	wg.Wait()
