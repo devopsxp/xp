@@ -1,14 +1,14 @@
-test:
-	go build && ./xp test --config  devopsxp.yaml
+playbook:
+	go build && ./xp playbook --config  devopsxp.yaml
 
 debug:
-	go build && ./xp test -d --config  devopsxp.yaml
+	go build && ./xp playbook -d --config  devopsxp.yaml
 
 log:
-	go build && ./xp test -d -l --config  devopsxp.yaml
+	go build && ./xp playbook -d -l --config  devopsxp.yaml
 
 cli:
-	go build && ./xp cli shell 127.0.0.1 192.168.50.1-255 -u lxp -a "hostname"
+	go build && ./xp cli shell 127.0.0.1-88 -u xp -a "hostname"
 
 build:
 	go build && ./xp -h

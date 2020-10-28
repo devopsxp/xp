@@ -21,13 +21,13 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// testCmd represents the test command
-var testCmd = &cobra.Command{
-	Use:   "test",
+// playbookCmd represents the playbook command
+var playbookCmd = &cobra.Command{
+	Use:   "playbook",
 	Short: "开发测试模块",
 	Long:  `测试ansile-playbook功能和pipeline流程管控`,
 	Run: func(cmd *cobra.Command, args []string) {
-		log.Debugln("test called")
+		log.Debugln("playbook called")
 		// fmt.Printf("%v %v\n", viper.GetStringSlice("stage"), viper.AllSettings())
 
 		// 根据yaml解析shell等模块，进行动态匹配，进行顺序执行
@@ -45,15 +45,15 @@ var testCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.AddCommand(testCmd)
+	rootCmd.AddCommand(playbookCmd)
 
 	// Here you will define your flags and configuration settings.
 
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
-	// testCmd.PersistentFlags().String("foo", "", "A help for foo")
+	// playbookCmd.PersistentFlags().String("foo", "", "A help for foo")
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
-	// testCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	// playbookCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }

@@ -1,7 +1,7 @@
 host: # 目标主机
   - 127.0.0.1
   # - 192.168.0.1-20
-remote_user: lxp 
+remote_user: xp 
 terminial: false
 roles: # 执行具体stage
   - vim-go
@@ -132,7 +132,6 @@ config: # 详细配置信息
     - ip a|grep eth0
     - pwd
     - uname -a
-    - zsh
     - docker ps && 
       docker images
     tags:

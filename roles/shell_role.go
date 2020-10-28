@@ -78,7 +78,7 @@ func (r *ShellRole) Run() error {
 				"Stage": r.stage,
 				"User":  r.remote_user,
 				"耗时":    time.Now().Sub(r.starttime),
-			}).Errorln(err.Error())
+			}).Errorln(fmt.Sprintf("%s | %s | %s | %s => %s", r.host, r.stage, r.name, r.shell, err.Error()))
 			r.logs[fmt.Sprintf("%s %s %s", r.stage, r.host, r.name)] = err.Error()
 			if strings.Contains(err.Error(), "ssh:") {
 				err = errors.New("ssh: handshake failed")
@@ -92,7 +92,7 @@ func (r *ShellRole) Run() error {
 				"Stage": r.stage,
 				"User":  r.remote_user,
 				"耗时":    time.Now().Sub(r.starttime),
-			}).Info(rs)
+			}).Info(fmt.Sprintf("%s | %s | %s | %s => \n%s", r.host, r.stage, r.name, r.shell, rs))
 			r.logs[fmt.Sprintf("%s %s %s", r.stage, r.host, r.name)] = rs
 		}
 	} else {
@@ -121,7 +121,7 @@ func (r *ShellRole) Run() error {
 					"Stage": r.stage,
 					"User":  r.remote_user,
 					"耗时":    time.Now().Sub(r.starttime),
-				}).Errorln(err.Error())
+				}).Errorln(fmt.Sprintf("%s | %s | %s | %s => %s", r.host, r.stage, r.name, cmd, err.Error()))
 				r.logs[fmt.Sprintf("%s %s %s", r.stage, r.host, r.name)] = err.Error()
 				if strings.Contains(err.Error(), "ssh:") {
 					err = errors.New("ssh: handshake failed")
@@ -135,7 +135,7 @@ func (r *ShellRole) Run() error {
 					"Stage": r.stage,
 					"User":  r.remote_user,
 					"耗时":    time.Now().Sub(r.starttime),
-				}).Info(rs)
+				}).Info(fmt.Sprintf("%s | %s | %s | %s => \n%s", r.host, r.stage, r.name, cmd, rs))
 				r.logs[fmt.Sprintf("%s %s %s", r.stage, r.host, r.name)] = rs
 			}
 		}
