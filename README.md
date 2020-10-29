@@ -56,6 +56,7 @@ xp is my name,but this project is look like ansible-playbook and pipeline togeth
   - [x] 识别shell_role中shell、copy、template等三级模块
   - [x] go template support
   - [ ] docker support
+  - [ ] systemd support（服务管理）
   - [ ] k8s support
   - [ ] ssh + docker support
   - [x] Hooks钩子函数支撑output plugin输出，目前支持console、email、wechat，todo： phone、sms、elasticsearch、log
