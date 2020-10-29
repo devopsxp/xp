@@ -16,44 +16,29 @@ limitations under the License.
 package cmd
 
 import (
-	"github.com/devopsxp/xp/pipeline"
-	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
-// testCmd represents the test command
-var testCmd = &cobra.Command{
-	Use:   "test",
-	Short: "开发测试模块",
-	Long:  `测试ansile-playbook功能和pipeline流程管控`,
-	Run: func(cmd *cobra.Command, args []string) {
-		log.Debugln("test called")
-		// fmt.Printf("%v %v\n", viper.GetStringSlice("stage"), viper.AllSettings())
-
-		// 根据yaml解析shell等模块，进行动态匹配，进行顺序执行
-		config := pipeline.DefaultPipeConfig("shell").
-			WithInputName("localyaml").
-			WithFilterName("shell").
-			WithOutputName("console")
-
-		p := pipeline.Of(*config)
-		p.Init()
-		p.Start()
-		p.Exec()
-		p.Stop()
-	},
+// cliCmd represents the cli command
+var cliCmd = &cobra.Command{
+	Use:   "cli",
+	Short: "本地命令行工具",
+	Long:  `本地执行命令cli，类似ansible $host -m $module -a "$command"`,
+	// Run: func(cmd *cobra.Command, args []string) {
+	// 	fmt.Println("Useage: ./xp cli -h 查看使用帮助")
+	// },
 }
 
 func init() {
-	rootCmd.AddCommand(testCmd)
+	rootCmd.AddCommand(cliCmd)
 
 	// Here you will define your flags and configuration settings.
 
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
-	// testCmd.PersistentFlags().String("foo", "", "A help for foo")
+	// cliCmd.PersistentFlags().String("foo", "", "A help for foo")
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
-	// testCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	// cliCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }

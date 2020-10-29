@@ -3,20 +3,25 @@ package roles
 import (
 	"errors"
 	"fmt"
+	"os"
+	"reflect"
 	"strings"
 	"time"
 
-	. "github.com/devopsxp/xp/plugin"
 	"github.com/devopsxp/xp/utils"
 	log "github.com/sirupsen/logrus"
 )
 
+func init() {
+	// 初始化shell role插件映射关系表
+	addRoles(ShellType, reflect.TypeOf(ShellRole{}))
+}
+
 type ShellRole struct {
 	RoleLC
-	shell string // 原生命令
-	msg   *Message
-	logs  map[string]string // 命令执行日志
-	items []string          // 多命令集合
+	shell       string   // 原生命令
+	items       []string // 多命令集合
+	isTerminial bool     // 是否交互式执行
 }
 
 // 准备数据
@@ -26,53 +31,25 @@ type ShellRole struct {
 // @Param vars 动态参数
 // @Param configs 执行模块内容
 // @Param msg 消息结构体
-func (r *ShellRole) Init(stage, user, host string, vars map[string]interface{}, data map[interface{}]interface{}, msg *Message) error {
-	if current_stage, ok := data["stage"]; !ok {
-		return errors.New("config 无 stage字段")
-	} else {
-		if stage != current_stage.(string) {
-			return errors.New(fmt.Sprintf("stage not equal %s %d != %s %d", stage, len(stage), current_stage, len(current_stage.(string))))
-		}
+func (r *ShellRole) Init(args *RoleArgs) error {
+	err := r.Common(args)
+	if err != nil {
+		return err
 	}
 
-	r.logs = make(map[string]string)
-	r.msg = msg
-	r.remote_user = user
-	r.stage = stage
-	r.vars = vars
-
-	r.host = host
+	r.isTerminial = args.isTerminial
 
 	// 获取原始shell命令
-	r.shell = data["shell"].(string)
+	r.shell = args.currentConfig["shell"].(string)
 
 	// 获取name
-	r.name = data["name"].(string)
+	r.name = args.currentConfig["name"].(string)
 
 	// 获取with_items迭代
-	if item, ok := data["with_items"]; ok {
+	if item, ok := args.currentConfig["with_items"]; ok {
 		for _, it := range item.([]interface{}) {
 			r.items = append(r.items, it.(string))
 		}
-	}
-
-	// 是否在可执行主机范围内
-	isTags := false
-
-	// 获取tags目标执行主机
-	if tags, ok := data["tags"]; ok {
-		for _, tag := range tags.([]interface{}) {
-			if host == tag.(string) {
-				isTags = true
-			}
-		}
-	} else {
-		// 没有设置tags标签，表示不限制主机执行
-		isTags = true
-	}
-
-	if !isTags {
-		return errors.New(fmt.Sprintf("Stage: %s Name: %s Host: %s 不在可执行主机范围内，退出！", stage, r.name, host))
 	}
 
 	return nil
@@ -80,9 +57,19 @@ func (r *ShellRole) Init(stage, user, host string, vars map[string]interface{}, 
 
 // 执行
 func (r *ShellRole) Run() error {
-	var err error
+	var (
+		err error
+		rs  string
+	)
 	if r.items == nil {
-		rs, err := utils.New(r.host, r.remote_user, "", 22).Run(r.shell)
+		cmd := fmt.Sprintf("bash -c \"%s\"", r.shell)
+		if r.isTerminial {
+			err = utils.New(r.host, r.remote_user, "", 22).RunTerminal(cmd, os.Stdout, os.Stderr)
+			rs = fmt.Sprintf("%s over", r.shell)
+		} else {
+			rs, err = utils.New(r.host, r.remote_user, "", 22).Run(cmd)
+		}
+
 		if err != nil {
 			log.WithFields(log.Fields{
 				"Host":  r.host,
@@ -91,7 +78,7 @@ func (r *ShellRole) Run() error {
 				"Stage": r.stage,
 				"User":  r.remote_user,
 				"耗时":    time.Now().Sub(r.starttime),
-			}).Errorln(err.Error())
+			}).Errorln(fmt.Sprintf("%s | %s | %s | %s => %s", r.host, r.stage, r.name, r.shell, err.Error()))
 			r.logs[fmt.Sprintf("%s %s %s", r.stage, r.host, r.name)] = err.Error()
 			if strings.Contains(err.Error(), "ssh:") {
 				err = errors.New("ssh: handshake failed")
@@ -105,7 +92,7 @@ func (r *ShellRole) Run() error {
 				"Stage": r.stage,
 				"User":  r.remote_user,
 				"耗时":    time.Now().Sub(r.starttime),
-			}).Info(rs)
+			}).Info(fmt.Sprintf("%s | %s | %s | %s => \n%s", r.host, r.stage, r.name, r.shell, rs))
 			r.logs[fmt.Sprintf("%s %s %s", r.stage, r.host, r.name)] = rs
 		}
 	} else {
@@ -118,7 +105,14 @@ func (r *ShellRole) Run() error {
 				panic(err)
 			}
 			log.Debugf("cmd is %s", cmd)
-			rs, err := utils.New(r.host, r.remote_user, "", 22).Run(cmd)
+
+			if r.isTerminial {
+				err = utils.New(r.host, r.remote_user, "", 22).RunTerminal(cmd, os.Stdout, os.Stderr)
+				rs = fmt.Sprintf("%s over", r.shell)
+			} else {
+				rs, err = utils.New(r.host, r.remote_user, "", 22).Run(cmd)
+			}
+
 			if err != nil {
 				log.WithFields(log.Fields{
 					"Host":  r.host,
@@ -127,7 +121,7 @@ func (r *ShellRole) Run() error {
 					"Stage": r.stage,
 					"User":  r.remote_user,
 					"耗时":    time.Now().Sub(r.starttime),
-				}).Errorln(err.Error())
+				}).Errorln(fmt.Sprintf("%s | %s | %s | %s => %s", r.host, r.stage, r.name, cmd, err.Error()))
 				r.logs[fmt.Sprintf("%s %s %s", r.stage, r.host, r.name)] = err.Error()
 				if strings.Contains(err.Error(), "ssh:") {
 					err = errors.New("ssh: handshake failed")
@@ -141,7 +135,7 @@ func (r *ShellRole) Run() error {
 					"Stage": r.stage,
 					"User":  r.remote_user,
 					"耗时":    time.Now().Sub(r.starttime),
-				}).Info(rs)
+				}).Info(fmt.Sprintf("%s | %s | %s | %s => \n%s", r.host, r.stage, r.name, cmd, rs))
 				r.logs[fmt.Sprintf("%s %s %s", r.stage, r.host, r.name)] = rs
 			}
 		}

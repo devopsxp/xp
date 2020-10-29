@@ -65,7 +65,7 @@ func (s *SshCheck) Status() StatusPlugin {
 	return s.status
 }
 
-func (s *SshCheck) Init() {
+func (s *SshCheck) Init(data interface{}) {
 	fmt.Println("Get machine and connecting test init")
 }
 
@@ -97,7 +97,7 @@ func (h *HelloInput) Status() StatusPlugin {
 	return h.status
 }
 
-func (h *HelloInput) Init() {}
+func (h *HelloInput) Init(data interface{}) {}
 
 // Upper filter插件，将消息全部字母转成大写
 type UpperFilter struct {
@@ -130,4 +130,4 @@ func (u *UpperFilter) Status() StatusPlugin {
 	return u.status
 }
 
-func (u *UpperFilter) Init() {}
+func (u *UpperFilter) Init(data interface{}) {}

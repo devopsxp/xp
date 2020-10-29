@@ -18,8 +18,6 @@ type CheckFactory struct{}
 func (i *CheckFactory) Create(conf Config) Plugin {
 	t, _ := checkNames[conf.Name]
 	p := reflect.New(t).Interface().(Plugin)
-	// 返回插件实例前调用Init函数，完成相关初始化方法
-	p.Init()
 	return p
 }
 
@@ -30,8 +28,6 @@ type InputFactory struct{}
 func (i *InputFactory) Create(conf Config) Plugin {
 	t, _ := inputNames[conf.Name]
 	p := reflect.New(t).Interface().(Plugin)
-	// 返回插件实例前调用Init函数，完成相关初始化方法
-	p.Init()
 	return p
 }
 
@@ -42,8 +38,6 @@ type FilterFactory struct{}
 func (i *FilterFactory) Create(conf Config) Plugin {
 	t, _ := filterNames[conf.Name]
 	p := reflect.New(t).Interface().(Plugin)
-	// 返回插件实例前调用Init函数，完成相关初始化方法
-	p.Init()
 	return p
 }
 
@@ -54,7 +48,5 @@ type OutputFactory struct{}
 func (i *OutputFactory) Create(conf Config) Plugin {
 	t, _ := outputNames[conf.Name]
 	p := reflect.New(t).Interface().(Plugin)
-	// 返回插件实例前调用Init函数，完成相关初始化方法
-	p.Init()
 	return p
 }
