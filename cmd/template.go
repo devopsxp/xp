@@ -16,16 +16,22 @@ limitations under the License.
 package cmd
 
 import (
-	"fmt"
+	"os"
 
+	"github.com/devopsxp/xp/pipeline"
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 // templateCmd represents the template command
 var templateCmd = &cobra.Command{
 	Use:   "template",
 	Short: "基于模板的远程文件传输",
-	Long: `使用go template进行文件模板解析并上传到远程目标主机上。example:
+	Long: `使用go template进行文件模板解析并上传到远程目标主机上。
+模板变量通过读取配置文件模块[vars]设置（全部改为小写字母）。
+eg: ./xp cli template 127.0.0.1 -u lxp -S template.service.j2  -D /tmp/docker.service
+example:
 #==============================DEMO=================================
 {{if .Status}} <font color="info">[成功] </font>{{ .title}} {{- else}}<font color="warning">[失败] </font> {{ .title}}  {{- end}} 
 > 服务名称：<font color="comment">{{.serviceName}}</font> 
@@ -58,7 +64,40 @@ COMMITINFO: <font color="comment">{{.info}}</font>
 {{end}}
 #==============================DEMO=================================`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("template called")
+		log.Debugf("Cli args: %v Vars: %v", args, viper.GetStringMap("vars"))
+		if cliSrc == "" || cliDest == "" {
+			log.Error("src or dest is not config")
+			os.Exit(1)
+		}
+
+		data := map[string]interface{}{
+			"host":        args,
+			"remote_user": cliUser,
+			"roles":       []interface{}{"template"},
+			"stage":       []interface{}{"template"},
+			"terminial":   false,
+			"vars":        viper.GetStringMap("vars"),
+			"hooks":       []interface{}{map[interface{}]interface{}{"type": "none"}},
+			"config": []interface{}{map[interface{}]interface{}{
+				"stage": "template",
+				"name":  "模板文件上传",
+				"template": map[interface{}]interface{}{
+					"src":  cliSrc,
+					"dest": cliDest,
+				},
+			}},
+		}
+
+		config := pipeline.DefaultPipeConfig("template").
+			WithInputName("cli").SetArgs(data).
+			WithFilterName("shell").
+			WithOutputName("console")
+
+		p := pipeline.Of(*config)
+		p.Init()
+		p.Start()
+		p.Exec()
+		p.Stop()
 	},
 }
 
@@ -74,4 +113,8 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// templateCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+
+	templateCmd.Flags().StringVarP(&cliUser, "user", "u", "root", "远程主机执行用户，默认：root")
+	templateCmd.Flags().StringVarP(&cliSrc, "src", "S", "", "本机模板文件")
+	templateCmd.Flags().StringVarP(&cliDest, "dest", "D", "", "目标机上传路径")
 }

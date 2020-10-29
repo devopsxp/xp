@@ -53,7 +53,7 @@ var shellCmd = &cobra.Command{
 			"vars":        map[string]interface{}{},
 			"hooks":       []interface{}{map[interface{}]interface{}{"type": cliLogout}},
 			"stage":       []interface{}{"shell"},
-			"config":      []interface{}{map[interface{}]interface{}{"stage": "shell", "name": "Running", "shell": cliShell}},
+			"config":      []interface{}{map[interface{}]interface{}{"stage": "shell", "name": "Shell命令模块", "shell": cliShell}},
 		}
 
 		config := pipeline.DefaultPipeConfig("cli").

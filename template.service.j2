@@ -1,8 +1,8 @@
-{{if .Status}} <font color="info">[成功] </font>{{ .title}} {{- else}}<font color="warning">[失败] </font> {{ .title}}  {{- end}} 
-> 服务名称：<font color="comment">{{.serviceName}}</font> 
-流水线名称：<font color="comment">{{.pipelineName}}</font> 
-流水线ID：<font color="comment">{{.pipelineId}}</font> 
-流水线地址：<font color="comment">{{.pipelineUrl}}</font> 
+{{if .status}} <font color="info">[成功] </font>{{ .title}} {{- else}}<font color="warning">[失败] </font> {{ .title}}  {{- end}} 
+> 服务名称：<font color="comment">{{.servicename}}</font> 
+流水线名称：<font color="comment">{{.pipelinename}}</font> 
+流水线ID：<font color="comment">{{.pipelineid}}</font> 
+流水线地址：<font color="comment">{{.pipelineurl}}</font> 
 构建分支：<font color="comment">{{.branch}}</font> 
 阶段：<font color="comment">{{.stage}}</font> 
 构建人：<font color="comment">{{.user}}</font> 

@@ -346,3 +346,6 @@ COMMITINFO: <font color="comment">{{.info}}</font>
   * pipeline
 2. cli module分离命令 [cobra add shell -p cliCmd]
 3. logours 格式标准化 [ansible]
+4. systemd 服务管理模块
+  * 匹配目标主机os系统
+  * 根据目标主机服务管理方式进行service管理服务启停
