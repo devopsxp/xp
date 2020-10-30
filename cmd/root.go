@@ -1,5 +1,5 @@
 /*
-Copyright © 2020 NAME HERE <EMAIL ADDRESS>
+Copyright © 2020 NAME lflxp 382023823@qq.com
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -128,8 +128,8 @@ func initConfig() {
 
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {
-		log.Println("Using config file:", viper.ConfigFileUsed())
+		log.Debugln("Using config file:", viper.ConfigFileUsed())
 	} else {
-		log.Printf("Using config file error: %s\n", err.Error())
+		log.Errorf("Using config file error: %s\n", err.Error())
 	}
 }

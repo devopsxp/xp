@@ -54,7 +54,7 @@ func (k *KafkaInput) Status() StatusPlugin {
 }
 
 // KakkaInput的Init函数实现
-func (k *KafkaInput) Init() {
+func (k *KafkaInput) Init(data interface{}) {
 	k.consumer = &MockConsumer{}
 }
 

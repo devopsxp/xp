@@ -29,7 +29,7 @@ type Plugin interface {
 	// 返回插件当前的运行状态
 	Status() StatusPlugin
 	// 新增初始化方法，在插件工厂返回实例前调用
-	Init()
+	Init(interface{})
 }
 
 // 检测插件，用于检测目标单位可执行状态

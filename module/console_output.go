@@ -79,7 +79,7 @@ func (c *ConsoleOutput) Send(msgs *Message) {
 
 }
 
-func (c *ConsoleOutput) Init() {
+func (c *ConsoleOutput) Init(data interface{}) {
 	c.name = "Console output"
 	c.status = Started
 }

@@ -39,7 +39,7 @@ func (h *hook) Send(msg *Message) {
 	h.start = time.Now()
 	switch h.Type {
 	case "console":
-		log.Printf("console hook send %v\n", msg.Data.Check)
+		log.Debugf("console hook send %v\n", msg.Data.Check)
 		for k, v := range msg.CallBack {
 			log.Warnln(k, v)
 		}

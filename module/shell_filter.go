@@ -3,6 +3,7 @@ package module
 import (
 	"os"
 	"reflect"
+	"runtime"
 
 	. "github.com/devopsxp/xp/plugin"
 	"github.com/devopsxp/xp/roles"
@@ -17,7 +18,8 @@ func init() {
 // shell 命令运行filter插件
 type ShellFilter struct {
 	LifeCycle
-	status StatusPlugin
+	status    StatusPlugin
+	terminial bool
 }
 
 func (s *ShellFilter) Process(msgs *Message) *Message {
@@ -28,8 +30,7 @@ func (s *ShellFilter) Process(msgs *Message) *Message {
 
 	// TODO:
 	// 1. 封装config shell|copy|template等操作
-	// 2.
-	log.Info("ShellFilter Filter 插件开始执行目标主机Config Playbook，并发数： 1")
+	log.Infof("ShellFilter Filter 插件开始执行目标主机Config Playbook，并发数： %d", runtime.NumCPU())
 
 	// 解析yaml结果
 	log.Debugf("解析yaml结果 Check %v\n", msgs.Data.Check)
@@ -46,6 +47,11 @@ func (s *ShellFilter) Process(msgs *Message) *Message {
 	} else {
 		log.Errorln("未配置config模块，退出！")
 		os.Exit(1)
+	}
+
+	// 解析terminial
+	if terminial, ok := msgs.Data.Items["terminial"]; ok {
+		s.terminial = terminial.(bool)
 	}
 
 	log.Debugf("Config %v\n", configs)
@@ -69,20 +75,14 @@ func (s *ShellFilter) Process(msgs *Message) *Message {
 	// 2. 根据stage进行解析
 	for host, status := range msgs.Data.Check {
 		if status == "failed" {
-			log.Errorf("host %s is failed, next.\n", host)
+			log.Debugf("host %s is failed, next.\n", host)
 		} else {
-			// log.Printf("执行目标主机： %s\n", host)
-			// 按照stage顺序执行configs配置
-			if stages == nil {
-				log.Errorln("未配置stage模块，退出！")
-				os.Exit(1)
-			}
 
 			for _, stage := range stages {
 				// 判断stage是否允许执行
 				if roles.IsRolesAllow(stage.(string), rolesData) {
 					// 3. TODO: 解析yaml中shell的模块，然后进行匹配
-					err := roles.NewShellRole(stage.(string), remote_user, host, vars, configs, msgs)
+					err := roles.NewShellRole(roles.NewRoleArgs(stage.(string), remote_user, host, vars, configs, msgs, nil, s.terminial))
 					if err != nil {
 						log.Errorln(err.Error())
 					}
@@ -94,7 +94,12 @@ func (s *ShellFilter) Process(msgs *Message) *Message {
 	return msgs
 }
 
-func (s *ShellFilter) Init() {
+func (s *ShellFilter) Init(data interface{}) {
 	s.name = "Shell Filter"
 	s.status = Started
+	if data != nil {
+		if isterminial, ok := data.(map[string]interface{})["terminial"]; ok {
+			s.terminial = isterminial.(bool)
+		}
+	}
 }
