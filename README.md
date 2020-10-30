@@ -350,3 +350,4 @@ COMMITINFO: <font color="comment">{{.info}}</font>
 4. systemd 服务管理模块
   * 匹配目标主机os系统
   * 根据目标主机服务管理方式进行service管理服务启停
+5. [ansible模块汇总(https://blog.csdn.net/qq_34646546/article/details/86606408)
