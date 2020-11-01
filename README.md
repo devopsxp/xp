@@ -64,6 +64,7 @@ xp is my name,but this project is look like ansible-playbook and pipeline togeth
   - [x] 动态环境变量(cobra支持)
   - [x] with_items迭代器
   - [x] 缓存中间产物
+  - [ ] include命令，允许导入复杂yaml文件夹的大量引用，类似ansible-playbook roles
 - [x] Debug日志
 - [x] CLI命令行工具(cobra)
 - [ ] 功能文件夹，提供：files、hosts、env等特殊目录模块
@@ -73,8 +74,8 @@ xp is my name,but this project is look like ansible-playbook and pipeline togeth
 - [ ] ssh [连接功能](https://github.com/mojocn/felix)
 - [x] 各个步骤的计时器和总执行计时
 - [ ] Retry重试机制
-  - [ ] 超时重试
-  - [ ] 错误重试
+  - [x] 超时重试
+  - [x] 错误重试
 - [ ] 容器化
   - [ ] docker support
     - [ ] yaml新增images字段
