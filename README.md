@@ -72,6 +72,9 @@ xp is my name,but this project is look like ansible-playbook and pipeline togeth
 - [x] module plugin插件机制
 - [ ] ssh [连接功能](https://github.com/mojocn/felix)
 - [x] 各个步骤的计时器和总执行计时
+- [ ] Retry重试机制
+  - [ ] 超时重试
+  - [ ] 错误重试
 - [ ] 容器化
   - [ ] docker support
     - [ ] yaml新增images字段

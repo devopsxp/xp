@@ -28,7 +28,7 @@ vars: # 环境变量 默认会将所有Key转换未小写字母，请写模板�
       labels:
         severity: warning
         node: 127.0.0.1
-        threshold_value: 80
+        threshold_value: 80console
     - status: ok
       generatorURL: http://www.google2.com
       startsAt: 2020-18-01
@@ -40,7 +40,7 @@ vars: # 环境变量 默认会将所有Key转换未小写字母，请写模板�
         node: 127.0.0.1
         threshold_value: 88
 hooks: # 消息发送 全局一个 可以一次发送所有结果到多个渠道
-  - type: console # 类型，支持：console|email|wechat|phone|sms
+  - type: none # 类型，支持：console|email|wechat|phone|sms
 #   - type: email
 #     alias: xp战队 # 邮箱昵称
 #     email_user: "xp@xp.com"
@@ -129,13 +129,13 @@ config: # 详细配置信息
     shell: "{{.item}}"
     with_items:
     - hostname
-    - ip a|grep eth0
+    - ip a
     - pwd
     - uname -a
-    - docker ps && 
-      docker images
     tags:
       - 127.0.0.1
+    retry: 3 # 重试次数
+    retryWait: 1 # 重试间隔 单位秒钟
   - stage: test
     name: 查看docker信息
     shell: systemctl status sshd
@@ -148,3 +148,4 @@ config: # 详细配置信息
       - hostname
     tags:
       - 127.0.0.1
+    retry: 2

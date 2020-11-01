@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"reflect"
 	"strings"
+	"time"
 
 	. "github.com/devopsxp/xp/plugin"
 	log "github.com/sirupsen/logrus"
@@ -134,10 +135,35 @@ func NewShellRole(args *RoleArgs) error {
 			// 执行Role
 			role.Pre()
 			role.Before()
-			err := role.Run()
-			if err != nil {
-				return err
+			// 处理重试逻辑
+			if retry, ok := config.(map[interface{}]interface{})["retry"]; ok {
+				for i := 0; i < retry.(int); i++ {
+					err := role.Run()
+					if err != nil {
+						log.Warningf("重试第 %d 次，主机: %s Stage: %s User: %s 错误信息： %s", i, args.host, args.stage, args.user, err.Error())
+						if i+1 == retry {
+							log.Errorf("重试次数 %d 完毕，未能执行完成，错误信息: %s", i, err.Error())
+							return err
+						}
+						// 重试等待时间
+						if retryWait, ok := config.(map[interface{}]interface{})["retryWait"]; ok {
+							log.Warnf("重试等待时间: %d 秒", retryWait.(int))
+							time.Sleep(time.Duration(retryWait.(int)) * time.Second)
+						} else {
+							log.Warnln("重试等待时间: 3 秒")
+							time.Sleep(3 * time.Second)
+						}
+					} else {
+						break
+					}
+				}
+			} else { // 如果没有设置retry字段
+				err := role.Run()
+				if err != nil {
+					return err
+				}
 			}
+
 			role.After()
 
 			// Role钩子函数 自定义hook

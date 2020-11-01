@@ -82,8 +82,9 @@ func (r *ShellRole) Run() error {
 			r.logs[fmt.Sprintf("%s %s %s", r.stage, r.host, r.name)] = err.Error()
 			if strings.Contains(err.Error(), "ssh:") {
 				err = errors.New("ssh: handshake failed")
-				goto OVER
+				// goto OVER
 			}
+			return errors.New(fmt.Sprintf("%s | %s | %s | %s => %s", r.host, r.stage, r.name, cmd, err.Error()))
 		} else {
 			log.WithFields(log.Fields{
 				"Host":  r.host,
@@ -125,8 +126,9 @@ func (r *ShellRole) Run() error {
 				r.logs[fmt.Sprintf("%s %s %s", r.stage, r.host, r.name)] = err.Error()
 				if strings.Contains(err.Error(), "ssh:") {
 					err = errors.New("ssh: handshake failed")
-					goto OVER
+					// goto OVER
 				}
+				return errors.New(fmt.Sprintf("%s | %s | %s | %s => %s", r.host, r.stage, r.name, cmd, err.Error()))
 			} else {
 				log.WithFields(log.Fields{
 					"Host":  r.host,
@@ -140,7 +142,7 @@ func (r *ShellRole) Run() error {
 			}
 		}
 	}
-OVER:
+	// OVER:
 	return err
 }
 
