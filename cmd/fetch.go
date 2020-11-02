@@ -16,8 +16,11 @@ limitations under the License.
 package cmd
 
 import (
-	"fmt"
+	"os"
+	"strings"
 
+	"github.com/devopsxp/xp/pipeline"
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -25,9 +28,54 @@ import (
 var fetchCmd = &cobra.Command{
 	Use:   "fetch",
 	Short: "抓取文件到管理机上",
-	Long:  `官方文档：https://docs.ansible.com/ansible/latest/modules/fetch_module.html#fetch-module`,
+	Long: `官方文档：https://docs.ansible.com/ansible/latest/modules/fetch_module.html#fetch-module
+	eg: ./xp cli fetch 127.0.0.1 -u lxp -S /tmp/123 -D /tmp/333`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("fetch called")
+		log.Debugf("Cli args: %v", args)
+		if cliSrc == "" || cliDest == "" {
+			log.Error("src or dest is not config")
+			os.Exit(1)
+		}
+
+		log.Debugln("items", cliItem)
+		var items []interface{}
+
+		if cliItem != "" {
+			items = []interface{}{}
+			for _, x := range strings.Split(cliItem, ",") {
+				items = append(items, x)
+			}
+		}
+
+		data := map[string]interface{}{
+			"host":        args,
+			"remote_user": cliUser,
+			"roles":       []interface{}{"fetch"},
+			"stage":       []interface{}{"fetch"},
+			"terminial":   false,
+			"vars":        map[string]interface{}{},
+			"hooks":       []interface{}{map[interface{}]interface{}{"type": "none"}},
+			"config": []interface{}{map[interface{}]interface{}{
+				"stage":      "fetch",
+				"name":       "下载文件模块",
+				"with_items": items,
+				"copy": map[interface{}]interface{}{
+					"src":  cliSrc,
+					"dest": cliDest,
+				},
+			}},
+		}
+
+		config := pipeline.DefaultPipeConfig("fetch").
+			WithInputName("cli").SetArgs(data).
+			WithFilterName("shell").
+			WithOutputName("console")
+
+		p := pipeline.Of(*config)
+		p.Init()
+		p.Start()
+		p.Exec()
+		p.Stop()
 	},
 }
 
@@ -43,4 +91,9 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// fetchCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+
+	fetchCmd.Flags().StringVarP(&cliUser, "user", "u", "root", "远程主机执行用户，默认：root")
+	fetchCmd.Flags().StringVarP(&cliSrc, "src", "S", "", "远程目标主机文件 [不是目录]，批量eg: {{.item}}")
+	fetchCmd.Flags().StringVarP(&cliDest, "dest", "D", "", "本地保存文件路径 [不是目录],批量eg: /tmp/{{.item}}")
+	fetchCmd.Flags().StringVarP(&cliItem, "items", "I", "", "批量文件上传,eg: /tmp/1,/usr/kubectl./bin/docker")
 }

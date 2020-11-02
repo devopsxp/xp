@@ -14,6 +14,12 @@ copy:
 	touch /tmp/123
 	go build && ./xp cli copy 127.0.0.1 -u lxp -S /tmp/123 -D /tmp/333
 
+fetch: clean
+	touch /tmp/1abc
+	mkdir /tmp/fetch
+	go build && ./xp cli fetch 127.0.0.1 -u xp -S /tmp/1abc -D /tmp/fetch/2abc
+	ls -lh /tmp/fetch
+
 template:
 	echo "hello {{.data}}" > /tmp/tmp.j2
 	go build && ./xp cli template 127.0.0.1 -u lxp -S template.service.j2  -D /tmp/docker.service
@@ -27,3 +33,7 @@ help:
 
 config:
 	go build && ./xp config
+
+clean:
+	rm -rf /tmp/fetch
+	rm -f /tmp/1abc

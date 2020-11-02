@@ -17,6 +17,7 @@ package cmd
 
 import (
 	"os"
+	"strings"
 
 	"github.com/devopsxp/xp/pipeline"
 	log "github.com/sirupsen/logrus"
@@ -24,9 +25,9 @@ import (
 )
 
 var (
-	cliSrc  string   // 源地址
-	cliDest string   // 目标路径
-	cliItem []string // 多文件传输
+	cliSrc  string // 源地址
+	cliDest string // 目标路径
+	cliItem string // 多文件传输
 )
 
 // copyCmd represents the copy command
@@ -42,11 +43,12 @@ eg: ./xp cli copy 127.0.0.1 -u lxp -S /tmp/123 -D /tmp/333`,
 			os.Exit(1)
 		}
 
+		log.Debugln("items", cliItem)
 		var items []interface{}
 
-		if len(cliItem) != 0 {
+		if cliItem != "" {
 			items = []interface{}{}
-			for _, x := range cliItem {
+			for _, x := range strings.Split(cliItem, ",") {
 				items = append(items, x)
 			}
 		}
@@ -61,7 +63,7 @@ eg: ./xp cli copy 127.0.0.1 -u lxp -S /tmp/123 -D /tmp/333`,
 			"hooks":       []interface{}{map[interface{}]interface{}{"type": "none"}},
 			"config": []interface{}{map[interface{}]interface{}{
 				"stage":      "copy",
-				"name":       "复制文件模块",
+				"name":       "上传文件模块",
 				"with_items": items,
 				"copy": map[interface{}]interface{}{
 					"src":  cliSrc,
@@ -99,5 +101,5 @@ func init() {
 	copyCmd.Flags().StringVarP(&cliUser, "user", "u", "root", "远程主机执行用户，默认：root")
 	copyCmd.Flags().StringVarP(&cliSrc, "src", "S", "", "原路径，批量eg: {{.item}}")
 	copyCmd.Flags().StringVarP(&cliDest, "dest", "D", "", "目的路径,批量eg: /tmp/{{.item}}")
-	copyCmd.Flags().StringArrayVarP(&cliItem, "items", "I", []string{}, "批量文件上传,eg: /tmp/1,/usr/kubectl./bin/docker")
+	copyCmd.Flags().StringVarP(&cliItem, "items", "I", "", "批量文件上传,eg: /tmp/1,/usr/kubectl./bin/docker")
 }
