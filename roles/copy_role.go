@@ -56,13 +56,9 @@ func (c *CopyRole) Run() error {
 		err := utils.New(c.host, c.remote_user, "", 22).SftpUploadToRemote(c.src, c.dest)
 		if err != nil {
 			log.WithFields(log.Fields{
-				"Host":  c.host,
-				"Name":  c.name,
-				"src":   c.src,
-				"dest":  c.dest,
-				"Stage": c.stage,
-				"User":  c.remote_user,
-				"耗时":    time.Now().Sub(c.starttime),
+				"src":  c.src,
+				"dest": c.dest,
+				"耗时":   time.Now().Sub(c.starttime),
 			}).Errorln(err.Error())
 			c.logs[fmt.Sprintf("%s %s %s", c.stage, c.host, c.name)] = err.Error()
 			if strings.Contains(err.Error(), "ssh:") {
@@ -71,13 +67,9 @@ func (c *CopyRole) Run() error {
 			}
 		} else {
 			log.WithFields(log.Fields{
-				"Host":  c.host,
-				"Name":  c.name,
-				"src":   c.src,
-				"dest":  c.dest,
-				"Stage": c.stage,
-				"User":  c.remote_user,
-				"耗时":    time.Now().Sub(c.starttime),
+				"src":  c.src,
+				"dest": c.dest,
+				"耗时":   time.Now().Sub(c.starttime),
 			}).Infof("success upload file %s", c.dest)
 			c.logs[fmt.Sprintf("%s %s %s", c.stage, c.host, c.name)] = fmt.Sprintf("success upload file %s", c.dest)
 		}
@@ -94,13 +86,9 @@ func (c *CopyRole) Run() error {
 			err = utils.New(c.host, c.remote_user, "", 22).SftpUploadToRemote(src, dest)
 			if err != nil {
 				log.WithFields(log.Fields{
-					"Host":  c.host,
-					"Name":  c.name,
-					"src":   src,
-					"dest":  dest,
-					"Stage": c.stage,
-					"User":  c.remote_user,
-					"耗时":    time.Now().Sub(c.starttime),
+					"src":  src,
+					"dest": dest,
+					"耗时":   time.Now().Sub(c.starttime),
 				}).Errorln(err.Error())
 				c.logs[fmt.Sprintf("%s %s %s", c.stage, c.host, c.name)] = err.Error()
 				if strings.Contains(err.Error(), "ssh:") {
@@ -109,13 +97,9 @@ func (c *CopyRole) Run() error {
 				}
 			} else {
 				log.WithFields(log.Fields{
-					"Host":  c.host,
-					"Name":  c.name,
-					"src":   src,
-					"dest":  dest,
-					"Stage": c.stage,
-					"User":  c.remote_user,
-					"耗时":    time.Now().Sub(c.starttime),
+					"src":  src,
+					"dest": dest,
+					"耗时":   time.Now().Sub(c.starttime),
 				}).Infof("success upload file %s", dest)
 				c.logs[fmt.Sprintf("%s %s %s", c.stage, c.host, c.name)] = fmt.Sprintf("success upload file %s", dest)
 			}

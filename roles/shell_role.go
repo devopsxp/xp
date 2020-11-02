@@ -71,14 +71,7 @@ func (r *ShellRole) Run() error {
 		}
 
 		if err != nil {
-			log.WithFields(log.Fields{
-				"Host":  r.host,
-				"Name":  r.name,
-				"Shell": r.shell,
-				"Stage": r.stage,
-				"User":  r.remote_user,
-				"耗时":    time.Now().Sub(r.starttime),
-			}).Errorln(fmt.Sprintf("%s | %s | %s | %s => %s", r.host, r.stage, r.name, r.shell, err.Error()))
+			log.WithFields(log.Fields{"耗时": time.Now().Sub(r.starttime)}).Errorln(fmt.Sprintf("[Item: %s] => %s", r.shell, rs))
 			r.logs[fmt.Sprintf("%s %s %s", r.stage, r.host, r.name)] = err.Error()
 			if strings.Contains(err.Error(), "ssh:") {
 				err = errors.New("ssh: handshake failed")
@@ -86,18 +79,11 @@ func (r *ShellRole) Run() error {
 			}
 			return errors.New(fmt.Sprintf("%s | %s | %s | %s => %s", r.host, r.stage, r.name, cmd, err.Error()))
 		} else {
-			log.WithFields(log.Fields{
-				"Host":  r.host,
-				"Name":  r.name,
-				"Shell": r.shell,
-				"Stage": r.stage,
-				"User":  r.remote_user,
-				"耗时":    time.Now().Sub(r.starttime),
-			}).Info(fmt.Sprintf("%s | %s | %s | %s => \n%s", r.host, r.stage, r.name, r.shell, rs))
+			log.WithFields(log.Fields{"耗时": time.Now().Sub(r.starttime)}).Info(fmt.Sprintf("[Item: %s] => %s", r.shell, rs))
 			r.logs[fmt.Sprintf("%s %s %s", r.stage, r.host, r.name)] = rs
 		}
 	} else {
-		for _, it := range r.items {
+		for n, it := range r.items {
 			// 补充go template基本语法
 			// 注意：只针对with_items数组类型
 			cmd, err := utils.ApplyTemplate(r.shell, map[string]interface{}{"item": it})
@@ -115,29 +101,16 @@ func (r *ShellRole) Run() error {
 			}
 
 			if err != nil {
-				log.WithFields(log.Fields{
-					"Host":  r.host,
-					"Name":  r.name,
-					"Shell": cmd,
-					"Stage": r.stage,
-					"User":  r.remote_user,
-					"耗时":    time.Now().Sub(r.starttime),
-				}).Errorln(fmt.Sprintf("%s | %s | %s | %s => %s", r.host, r.stage, r.name, cmd, err.Error()))
 				r.logs[fmt.Sprintf("%s %s %s", r.stage, r.host, r.name)] = err.Error()
 				if strings.Contains(err.Error(), "ssh:") {
 					err = errors.New("ssh: handshake failed")
 					// goto OVER
+				} else {
+					log.WithFields(log.Fields{"耗时": time.Now().Sub(r.starttime)}).Errorln(fmt.Sprintf("[序号: %d Item: %s] => %s", n, cmd, rs))
 				}
-				return errors.New(fmt.Sprintf("%s | %s | %s | %s => %s", r.host, r.stage, r.name, cmd, err.Error()))
+				return errors.New(fmt.Sprintf("%s | %s | %s | %s => %s %s", r.host, r.stage, r.name, cmd, rs, err.Error()))
 			} else {
-				log.WithFields(log.Fields{
-					"Host":  r.host,
-					"Name":  r.name,
-					"Shell": cmd,
-					"Stage": r.stage,
-					"User":  r.remote_user,
-					"耗时":    time.Now().Sub(r.starttime),
-				}).Info(fmt.Sprintf("%s | %s | %s | %s => \n%s", r.host, r.stage, r.name, cmd, rs))
+				log.WithFields(log.Fields{"耗时": time.Now().Sub(r.starttime)}).Info(fmt.Sprintf("[序号: %d Item: %s] => %s", n, cmd, rs))
 				r.logs[fmt.Sprintf("%s %s %s", r.stage, r.host, r.name)] = rs
 			}
 		}

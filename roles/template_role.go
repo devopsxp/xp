@@ -62,12 +62,8 @@ func (r *TemplateRole) Run() error {
 	err = utils.New(r.host, r.remote_user, "", 22).SftpUploadTemplateString(destFile, r.dest)
 	if err != nil {
 		log.WithFields(log.Fields{
-			"Host":     r.host,
-			"Name":     r.name,
 			"template": r.src,
 			"dest":     r.dest,
-			"Stage":    r.stage,
-			"User":     r.remote_user,
 			"耗时":       time.Now().Sub(r.starttime),
 		}).Errorln(err.Error())
 		r.logs[fmt.Sprintf("%s %s %s", r.stage, r.host, r.name)] = err.Error()
@@ -77,12 +73,8 @@ func (r *TemplateRole) Run() error {
 		}
 	} else {
 		log.WithFields(log.Fields{
-			"Host":     r.host,
-			"Name":     r.name,
 			"template": r.src,
 			"dest":     r.dest,
-			"Stage":    r.stage,
-			"User":     r.remote_user,
 			"耗时":       time.Now().Sub(r.starttime),
 		}).Infof("模板上传成功 %s", r.dest)
 		r.logs[fmt.Sprintf("%s %s %s", r.stage, r.host, r.name)] = fmt.Sprintf("模板上传成功 %s", r.dest)

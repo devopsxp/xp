@@ -79,6 +79,7 @@ func (l *LocalYamlInput) Start() {
 
 	var wg sync.WaitGroup
 
+	log.Infoln("******************************************************** TASK [LocalYamlCheck : 主机状态检测] ********************************************************")
 	log.Infof("LocalYaml Input 插件开始执行ssh目标主机状态扫描，并发数： %d", 5*runtime.NumCPU())
 	for n, i := range ips {
 		wg.Add(1)

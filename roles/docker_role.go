@@ -158,11 +158,7 @@ func (r *DockerRole) Run() error {
 	rs, err := cli.CreateContainer(data)
 	if err != nil {
 		log.WithFields(log.Fields{
-			"Host":   r.host,
-			"Name":   r.name,
 			"Script": len(r.script),
-			"Stage":  r.stage,
-			"User":   r.remote_user,
 			"耗时":     time.Now().Sub(r.starttime),
 		}).Errorln(err.Error())
 		r.logs[fmt.Sprintf("%s %s %s", r.stage, r.host, r.name)] = err.Error()
@@ -170,11 +166,7 @@ func (r *DockerRole) Run() error {
 	}
 
 	log.WithFields(log.Fields{
-		"Host":   r.host,
-		"Name":   r.name,
 		"Script": len(r.script),
-		"Stage":  r.stage,
-		"User":   r.remote_user,
 		"耗时":     time.Now().Sub(r.starttime),
 	}).Info(string(rs))
 	r.logs[fmt.Sprintf("%s %s %s", r.stage, r.host, r.name)] = string(rs)

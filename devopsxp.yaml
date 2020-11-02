@@ -104,6 +104,7 @@ config: # 详细配置信息
     shell: "{{ .item }}"
     with_items:
     - git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim 
+    - uname -a
   - stage: build
     name: template 模板测试
     template: 
@@ -134,7 +135,7 @@ config: # 详细配置信息
     - uname -a
     tags:
       - 127.0.0.1
-    retry: 3 # 重试次数
+    retry: 10 # 重试次数
     retryWait: 1 # 重试间隔 单位秒钟
   - stage: test
     name: 查看docker信息
@@ -148,4 +149,5 @@ config: # 详细配置信息
       - hostname
     tags:
       - 127.0.0.1
-    retry: 2
+    retry: 10
+    retryWait: 1
