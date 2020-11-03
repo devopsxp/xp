@@ -84,10 +84,10 @@ xp is my name,but this project is look like ansible-playbook and pipeline togeth
   - [x] 错误重试
 - [ ] 容器化
   - [ ] docker support
-    - [ ] yaml新增images字段
+    - [x] yaml新增images字段
     - [ ] [Remote API](https://docs.docker.com/engine/api/v1.24/)
   - [ ] k8s support
-    - [ ] yaml新增k8s字段
+    - [x] yaml新增k8s字段
     - [ ] k8s agent/operator
   - [ ] ssh + docker support
 

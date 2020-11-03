@@ -5,6 +5,37 @@
     - date
     - pwd
     - hostname
+  container:
+    Hostname: "hn"
+    User: "root"
+    Image: ubuntu
+    Volumes:
+      "/tmp": "/tmp"
+    WorkingDir: "/"
+    NetworkDisabled: false
+    ExposedPorts:
+      "22/tcp": ""
+    HostConfig: 
+      Binds: "/tmp:/tmp"
+      Memory: 0
+      MemorySwap: 0
+      MemoryReservation: 0
+      KernelMemory: 0
+      CpuShares: 512
+      CpuPeriod: 100000
+      CpuQuota: 50000
+      CpusetCpus: ""
+      CpusetMems: ""
+      IOMaximumBandwidth: 0
+      IOMaximumIOps: 0
+      MemorySwappiness: 60
+      OomKillDisable: false
+      OomScoreAdj: 500
+      PidMode: ""
+      PidsLimit: -1
+      LogConfig:
+        Type: "json-file"
+        Config: ""
   tags:
     - 127.0.0.1
   retry: 10
