@@ -7,6 +7,7 @@ import (
 
 	. "github.com/devopsxp/xp/plugin"
 	"github.com/devopsxp/xp/roles"
+	"github.com/devopsxp/xp/utils"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -49,6 +50,37 @@ func (s *ShellFilter) Process(msgs *Message) *Message {
 		os.Exit(1)
 	}
 
+	// 解析include目录文件加载Yaml
+	// include: /tmp/d.yaml
+	// name: "name"
+	for _, cc := range configs {
+		rt, ok := roles.ParseRoleType(cc.(map[interface{}]interface{}))
+		if ok && rt == roles.IncludeType {
+			// 获取include路径
+			includePath, ok := cc.(map[interface{}]interface{})["include"]
+			if ok {
+				log.Infof("匹配到 include 配置[%s] %s", cc.(map[interface{}]interface{})["name"], includePath)
+				// include 配置格式为： [map[interface{}]interface{}]
+				iData, err := utils.ReadYamlConfig(includePath.(string))
+				if err != nil {
+					log.Errorf("读取include yaml文件错误：%s", err.Error())
+					os.Exit(1)
+				}
+
+				switch iData.(type) { //v表示b1 接口转换成Bag对象的值
+				case []interface{}:
+					configs = append(configs, iData.([]interface{})...)
+				case map[interface{}]interface{}:
+					configs = append(configs, iData.(map[interface{}]interface{}))
+				default:
+					log.Warnf("Include Yaml文件格式不能匹配")
+				}
+			}
+		}
+	}
+
+	log.Debugln("configs", configs)
+
 	// 解析terminial
 	if terminial, ok := msgs.Data.Items["terminial"]; ok {
 		s.terminial = terminial.(bool)
@@ -85,6 +117,7 @@ func (s *ShellFilter) Process(msgs *Message) *Message {
 					err := roles.NewShellRole(roles.NewRoleArgs(stage.(string), remote_user, host, vars, configs, msgs, nil, s.terminial))
 					if err != nil {
 						log.Debugln(err.Error())
+						os.Exit(1)
 					}
 				}
 			}

@@ -99,55 +99,14 @@ stage: # 流程步骤
   - build
   - test
 config: # 详细配置信息
-  - stage: vim-go
-    name: install vim-go plugin
-    shell: "{{ .item }}"
-    with_items:
-    - git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim 
-    - uname -a
-  - stage: build
-    name: template 模板测试
-    template: 
-      src: template.service.j2 
-      dest: /tmp/docker.service
+  - include: ./yaml/shell.yaml
+    name: shell测试
+  - include: ./yaml/copy.yaml
+    name: copy测试
+  - include: ./yaml/image.yaml
+    name: image测试
+  - include: ./yaml/template.yaml
+    name: template测试
   - stage: test
-    name: 上传文件
-    copy: 
-      src: "{{ .item }}"
-      dest: /tmp/{{ .item }}
-    with_items:
-      - LICENSE
-    tags: # 指定主机执行
-      - 192.168.0.10
-  - stage: what
-    name: 非stage测试
-    shell: whoami
-  - stage: build
-    name: 获取go version
-    shell: lsb_release -a
-  - stage: test
-    name: 获取主机名
-    shell: "{{.item}}"
-    with_items:
-    - hostname
-    - ip a
-    - pwd
-    - uname -a
-    tags:
-      - 127.0.0.1
-    retry: 10 # 重试次数
-    retryWait: 1 # 重试间隔 单位秒钟
-  - stage: test
-    name: 查看docker信息
-    shell: systemctl status sshd
-  - stage: test
-    name: docker image执行测试
-    image: ubuntu
-    script:
-      - date
-      - pwd
-      - hostname
-    tags:
-      - 127.0.0.1
-    retry: 10
-    retryWait: 1
+    name: Demo测试
+    shell: echo 'This is Demo Test!'

@@ -1,0 +1,30 @@
+- stage: build 
+  name: "111111111111111111111111"
+  shell: "hostname"
+- stage: what
+  name: 非stage测试
+  shell: whoami
+- stage: build
+  name: 获取go version
+  shell: go version
+- stage: vim-go
+  name: install vim-go plugin
+  shell: "{{ .item }}"
+  with_items:
+  - git version
+  - uname -a
+- stage: test
+  name: 获取主机名
+  shell: "{{.item}}"
+  with_items:
+  - hostname
+  - ip a
+  - pwd
+  - uname -a
+  tags:
+    - 127.0.0.1
+  retry: 10 # 重试次数
+  retryWait: 1 # 重试间隔 单位秒钟
+- stage: test
+  name: 查看docker信息
+  shell: systemctl status sshd

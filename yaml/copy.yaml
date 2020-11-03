@@ -1,0 +1,10 @@
+- stage: test
+  name: 上传文件
+  copy: 
+    src: "{{ .item }}"
+    dest: /tmp/{{ .item }}
+  with_items:
+    - LICENSE
+  tags: # 指定主机执行
+    - 192.168.0.10
+    - 127.0.0.1

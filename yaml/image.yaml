@@ -1,0 +1,11 @@
+- stage: test
+  name: docker image执行测试
+  image: ubuntu
+  script:
+    - date
+    - pwd
+    - hostname
+  tags:
+    - 127.0.0.1
+  retry: 10
+  retryWait: 1

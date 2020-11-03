@@ -1,0 +1,5 @@
+- stage: build
+  name: template 模板测试
+  template: 
+    src: template.service.j2 
+    dest: /tmp/docker.service

@@ -46,7 +46,7 @@ func IsRolesAllow(stage string, roles []interface{}) bool {
 
 // 自动匹配roleNames对象和目标对象的匹配度
 // 实现yaml即不用新增type字段又能自动匹配Role插件
-func parseRoleType(config map[interface{}]interface{}) (rt RoleType, isok bool) {
+func ParseRoleType(config map[interface{}]interface{}) (rt RoleType, isok bool) {
 	isok = false
 	// 遍历字段，匹配模块
 	for k, _ := range config {
@@ -112,67 +112,71 @@ func NewShellRole(args *RoleArgs) error {
 		// 静止并行执行
 		args.currentConfig = config.(map[interface{}]interface{})
 		log.Debugf("当前步骤: %d 当前Stage: %s Config信息: %v", n, args.stage, config)
-		rt, ok := parseRoleType(config.(map[interface{}]interface{}))
+		rt, ok := ParseRoleType(config.(map[interface{}]interface{}))
 		if !ok {
 			return errors.New(fmt.Sprintf("未匹配到目标Role %v", config))
 		}
-		// 根据RoleType创建对应Role类型
-		role, err := rf.Create(rt)
-		if err != nil {
-			return err
-		}
 
-		// 初始化role
-		err = role.Init(args)
-		if err != nil {
-			// 判断是stage不匹配还是其它错误
-			if strings.Contains(err.Error(), "not equal") || strings.Contains(err.Error(), "不在可执行主机范围内") {
-				log.Debugf("%s %v", args.host, err)
-			} else {
+		// 排除Include Tags
+		if rt != IncludeType {
+			// 根据RoleType创建对应Role类型
+			role, err := rf.Create(rt)
+			if err != nil {
 				return err
 			}
-		} else {
-			// 执行Role
-			role.Pre()
-			role.Before()
-			// 处理重试逻辑
-			if retry, ok := config.(map[interface{}]interface{})["retry"]; ok {
-				for i := 0; i < retry.(int); i++ {
+
+			// 初始化role
+			err = role.Init(args)
+			if err != nil {
+				// 判断是stage不匹配还是其它错误
+				if strings.Contains(err.Error(), "not equal") || strings.Contains(err.Error(), "不在可执行主机范围内") {
+					log.Debugf("%s %v", args.host, err)
+				} else {
+					return err
+				}
+			} else {
+				// 执行Role
+				role.Pre()
+				role.Before()
+				// 处理重试逻辑
+				if retry, ok := config.(map[interface{}]interface{})["retry"]; ok {
+					for i := 0; i < retry.(int); i++ {
+						err := role.Run()
+						if err != nil {
+							log.Warningf("重试第 %d 次，主机: %s Stage: %s User: %s 错误信息： %s", i, args.host, args.stage, args.user, err.Error())
+							if i+1 == retry {
+								log.Errorf("重试次数 %d 完毕，未能执行完成，错误信息: %s", i, err.Error())
+								return err
+							}
+							// 重试等待时间
+							if retryWait, ok := config.(map[interface{}]interface{})["retryWait"]; ok {
+								log.Warnf("重试等待时间: %d 秒", retryWait.(int))
+								time.Sleep(time.Duration(retryWait.(int)) * time.Second)
+							} else {
+								log.Warnln("重试等待时间: 3 秒")
+								time.Sleep(3 * time.Second)
+							}
+						} else {
+							break
+						}
+					}
+				} else { // 如果没有设置retry字段
 					err := role.Run()
 					if err != nil {
-						log.Warningf("重试第 %d 次，主机: %s Stage: %s User: %s 错误信息： %s", i, args.host, args.stage, args.user, err.Error())
-						if i+1 == retry {
-							log.Errorf("重试次数 %d 完毕，未能执行完成，错误信息: %s", i, err.Error())
-							return err
-						}
-						// 重试等待时间
-						if retryWait, ok := config.(map[interface{}]interface{})["retryWait"]; ok {
-							log.Warnf("重试等待时间: %d 秒", retryWait.(int))
-							time.Sleep(time.Duration(retryWait.(int)) * time.Second)
-						} else {
-							log.Warnln("重试等待时间: 3 秒")
-							time.Sleep(3 * time.Second)
-						}
-					} else {
-						break
+						return err
 					}
 				}
-			} else { // 如果没有设置retry字段
-				err := role.Run()
-				if err != nil {
-					return err
-				}
-			}
 
-			role.After()
+				role.After()
 
-			// Role钩子函数 自定义hook
-			// @Param 实现里RolePlugin接口的实例
-			ishook := role.IsHook()
-			if ishook {
-				err = role.Hooks()
-				if err != nil {
-					return err
+				// Role钩子函数 自定义hook
+				// @Param 实现里RolePlugin接口的实例
+				ishook := role.IsHook()
+				if ishook {
+					err = role.Hooks()
+					if err != nil {
+						return err
+					}
 				}
 			}
 		}
