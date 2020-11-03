@@ -64,7 +64,7 @@ xp is my name,but this project is look like ansible-playbook and pipeline togeth
   - [x] 动态环境变量(cobra支持)
   - [x] with_items迭代器
   - [x] 缓存中间产物
-  - [ ] include命令，允许导入复杂yaml文件夹的大量引用，类似ansible-playbook roles
+  - [x] include命令，允许导入复杂yaml文件夹的大量引用，类似ansible-playbook roles
   - [x] fetch模块
   - [ ] user模块
   - [ ] group模块

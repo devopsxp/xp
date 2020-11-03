@@ -71,13 +71,13 @@ func (r *ShellRole) Run() error {
 		}
 
 		if err != nil {
-			log.WithFields(log.Fields{"耗时": time.Now().Sub(r.starttime)}).Errorln(fmt.Sprintf("[Item: %s] => %s", r.shell, rs))
+			log.WithFields(log.Fields{"耗时": time.Now().Sub(r.starttime)}).Errorln(fmt.Sprintf("[Item: %s] => %s", r.shell, err.Error()))
 			r.logs[fmt.Sprintf("%s %s %s", r.stage, r.host, r.name)] = err.Error()
 			if strings.Contains(err.Error(), "ssh:") {
 				err = errors.New("ssh: handshake failed")
 				// goto OVER
 			}
-			return errors.New(fmt.Sprintf("%s | %s | %s | %s => %s", r.host, r.stage, r.name, cmd, err.Error()))
+			// return errors.New(fmt.Sprintf("%s | %s | %s | %s => %s", r.host, r.stage, r.name, cmd, err.Error()))
 		} else {
 			log.WithFields(log.Fields{"耗时": time.Now().Sub(r.starttime)}).Info(fmt.Sprintf("[Item: %s] => %s", r.shell, rs))
 			r.logs[fmt.Sprintf("%s %s %s", r.stage, r.host, r.name)] = rs
@@ -106,9 +106,9 @@ func (r *ShellRole) Run() error {
 					err = errors.New("ssh: handshake failed")
 					// goto OVER
 				} else {
-					log.WithFields(log.Fields{"耗时": time.Now().Sub(r.starttime)}).Errorln(fmt.Sprintf("[序号: %d Item: %s] => %s", n, cmd, rs))
+					log.WithFields(log.Fields{"耗时": time.Now().Sub(r.starttime)}).Errorln(fmt.Sprintf("[序号: %d Item: %s] => %s", n, cmd, err.Error()))
 				}
-				return errors.New(fmt.Sprintf("%s | %s | %s | %s => %s %s", r.host, r.stage, r.name, cmd, rs, err.Error()))
+				// return errors.New(fmt.Sprintf("%s | %s | %s | %s => %s %s", r.host, r.stage, r.name, cmd, rs, err.Error()))
 			} else {
 				log.WithFields(log.Fields{"耗时": time.Now().Sub(r.starttime)}).Info(fmt.Sprintf("[序号: %d Item: %s] => %s", n, cmd, rs))
 				r.logs[fmt.Sprintf("%s %s %s", r.stage, r.host, r.name)] = rs
