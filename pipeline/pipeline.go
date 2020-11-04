@@ -3,6 +3,7 @@ package pipeline
 import (
 	"time"
 
+	"github.com/briandowns/spinner"
 	"github.com/devopsxp/xp/plugin"
 	log "github.com/sirupsen/logrus"
 )
@@ -64,6 +65,7 @@ type Pipeline struct {
 	filter  plugin.Filter
 	output  plugin.Output
 	tmpargs interface{}
+	spinner *spinner.Spinner
 }
 
 // 一个消息的处理流程 check -> input -> filter -> output
@@ -78,6 +80,7 @@ func (p *Pipeline) Exec() {
 
 // 启动的顺序 output -> filter -> input -> check
 func (p *Pipeline) Start() {
+	p.spinner.Start()
 	p.output.Start()
 	p.filter.Start()
 	p.input.Start()
@@ -88,6 +91,7 @@ func (p *Pipeline) Start() {
 
 // 停止的顺序 check -> input -> filter -> output
 func (p *Pipeline) Stop() {
+	defer p.spinner.Stop()
 	// p.check.Stop()
 	p.input.Stop()
 	p.filter.Stop()
@@ -102,6 +106,7 @@ func (p *Pipeline) Status() plugin.StatusPlugin {
 }
 
 func (p *Pipeline) Init() {
+	p.spinner = spinner.New(spinner.CharSets[38], 100*time.Millisecond)
 	p.start = time.Now()
 	// p.check.Init()
 	p.input.Init(p.tmpargs)

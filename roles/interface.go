@@ -53,8 +53,9 @@ type RoleLC struct {
 	starttime   time.Time              // 计算执行时间之开始时间
 	hook        *Hook
 	// 上下文
-	msg  *Message
-	logs map[string]string // 命令执行日志
+	msg       *Message
+	logs      map[string]string // 命令执行日志
+	terminial bool              // ssh 是否交互式执行
 }
 
 // common 公共初始化函数
@@ -99,6 +100,13 @@ func (r *RoleLC) Common(args *RoleArgs) error {
 	} else {
 		// 没有设置tags标签，表示不限制主机执行
 		isTags = true
+	}
+
+	// 每个config shell terminial 是否交互式执行
+	if terminial, ok := args.currentConfig["terminial"]; ok {
+		r.terminial = terminial.(bool)
+	} else {
+		r.terminial = false
 	}
 
 	if !isTags {

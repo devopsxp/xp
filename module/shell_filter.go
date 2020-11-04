@@ -19,8 +19,7 @@ func init() {
 // shell 命令运行filter插件
 type ShellFilter struct {
 	LifeCycle
-	status    StatusPlugin
-	terminial bool
+	status StatusPlugin
 }
 
 func (s *ShellFilter) Process(msgs *Message) *Message {
@@ -81,11 +80,6 @@ func (s *ShellFilter) Process(msgs *Message) *Message {
 
 	log.Debugln("configs", configs)
 
-	// 解析terminial
-	if terminial, ok := msgs.Data.Items["terminial"]; ok {
-		s.terminial = terminial.(bool)
-	}
-
 	log.Debugf("Config %v\n", configs)
 	var remote_user string
 	if user, ok := msgs.Data.Items["remote_user"]; ok {
@@ -114,7 +108,7 @@ func (s *ShellFilter) Process(msgs *Message) *Message {
 				// 判断stage是否允许执行
 				if roles.IsRolesAllow(stage.(string), rolesData) {
 					// 3. TODO: 解析yaml中shell的模块，然后进行匹配
-					err := roles.NewShellRole(roles.NewRoleArgs(stage.(string), remote_user, host, vars, configs, msgs, nil, s.terminial))
+					err := roles.NewShellRole(roles.NewRoleArgs(stage.(string), remote_user, host, vars, configs, msgs, nil))
 					if err != nil {
 						log.Debugln(err.Error())
 						os.Exit(1)
@@ -130,9 +124,4 @@ func (s *ShellFilter) Process(msgs *Message) *Message {
 func (s *ShellFilter) Init(data interface{}) {
 	s.name = "Shell Filter"
 	s.status = Started
-	if data != nil {
-		if isterminial, ok := data.(map[string]interface{})["terminial"]; ok {
-			s.terminial = isterminial.(bool)
-		}
-	}
 }

@@ -27,4 +27,11 @@
   retryWait: 1 # 重试间隔 单位秒钟
 - stage: test
   name: 查看docker信息
-  shell: systemctl status sshd
+  shell: "{{.item}}"
+  with_items:
+  - systemctl status sshd
+  - docker info
+  - docker images
+  - docker ps
+  retry: 3
+  terminial: true # ssh 是否交互式执行

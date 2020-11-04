@@ -76,19 +76,17 @@ type RoleArgs struct {
 	currentConfig     map[interface{}]interface{}
 	msg               *Message
 	hook              *Hook
-	isTerminial       bool
 }
 
-func NewRoleArgs(stage, user, host string, vars map[string]interface{}, configs []interface{}, msg *Message, hook *Hook, terminial bool) *RoleArgs {
+func NewRoleArgs(stage, user, host string, vars map[string]interface{}, configs []interface{}, msg *Message, hook *Hook) *RoleArgs {
 	return &RoleArgs{
-		stage:       stage,
-		user:        user,
-		host:        host,
-		vars:        vars,
-		configs:     configs,
-		msg:         msg,
-		hook:        hook,
-		isTerminial: terminial,
+		stage:   stage,
+		user:    user,
+		host:    host,
+		vars:    vars,
+		configs: configs,
+		msg:     msg,
+		hook:    hook,
 	}
 }
 

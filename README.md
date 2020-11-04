@@ -75,11 +75,12 @@ xp is my name,but this project is look like ansible-playbook and pipeline togeth
 - [x] CLI命令行工具(cobra)
 - [ ] 功能文件夹，提供：files、hosts、env等特殊目录模块
 - [ ] roles ansible模块
+  - [x] yaml目录通过include模块引入
 - [ ] module man模块说明文档
 - [x] module plugin插件机制
 - [ ] ssh [连接功能](https://github.com/mojocn/felix)
 - [x] 各个步骤的计时器和总执行计时
-- [ ] Retry重试机制
+- [x] Retry重试机制
   - [x] 超时重试
   - [x] 错误重试
 - [ ] 容器化
@@ -355,9 +356,6 @@ COMMITINFO: <font color="comment">{{.info}}</font>
   * inputPlugin
   * 匹配数据
   * pipeline
-2. cli module分离命令 [cobra add shell -p cliCmd]
-3. logours 格式标准化 [ansible]
-4. systemd 服务管理模块
+2. systemd 服务管理模块
   * 匹配目标主机os系统
   * 根据目标主机服务管理方式进行service管理服务启停
-5. [ansible模块汇总(https://blog.csdn.net/qq_34646546/article/details/86606408)

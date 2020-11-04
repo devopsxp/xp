@@ -8,7 +8,7 @@ log:
 	go build && ./xp playbook -d -l --config  devopsxp.yaml
 
 cli:
-	go build && ./xp cli shell 127.0.0.1-88 -u lxp -a "hostname"
+	go build && ./xp cli shell 127.0.0.1-88 -u lxp -a "hostname" -L console
 
 copy:
 	touch /tmp/123
