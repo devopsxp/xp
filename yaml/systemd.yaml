@@ -1,0 +1,13 @@
+- stage: test
+  name: 测试systemd 
+  systemd:
+    name: docker
+    state: status
+  terminial: false
+
+- stage: test
+  name: 测试systemd stop
+  systemd:
+    name: docker
+    state: stop
+  terminial: false

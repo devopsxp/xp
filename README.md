@@ -56,7 +56,7 @@ xp is my name,but this project is look like ansible-playbook and pipeline togeth
   - [x] 识别shell_role中shell、copy、template等三级模块
   - [x] go template support
   - [ ] docker support
-  - [ ] systemd support（服务管理）
+  - [x] systemd support（服务管理）
   - [ ] k8s support
   - [ ] ssh + docker support
   - [x] Hooks钩子函数支撑output plugin输出，目前支持console、email、wechat，todo： phone、sms、elasticsearch、log
@@ -83,6 +83,16 @@ xp is my name,but this project is look like ansible-playbook and pipeline togeth
 - [x] Retry重试机制
   - [x] 超时重试
   - [x] 错误重试
+- [x] 消息发送
+  - [x] 邮件
+  - [x] 企业微信/叮叮 
+  - [x] 短信
+- [ ] 中间件对接
+  - [ ] sonarque
+  - [ ] jmeter
+  - [ ] jenkins
+  - [ ] 安全扫描
+  - [ ] ArgoCD
 - [ ] 容器化
   - [ ] docker support
     - [x] yaml新增images字段
@@ -91,6 +101,7 @@ xp is my name,but this project is look like ansible-playbook and pipeline togeth
     - [x] yaml新增k8s字段
     - [ ] k8s agent/operator
   - [ ] ssh + docker support
+  - [ ] 中间产物缓存
 
 
 # Useage
@@ -125,7 +136,7 @@ cli -> main.go -> root.go -> test.go -> pipeline -> init -> start -> check(ssh) 
 
 # 配置信息
 
-本工具采用ssh免密登录进行远程主机命令的执行，需要ssh私钥进行连接，默认获取文件地址为：~/.ssh/id_rsa
+本工具采用ssh免密登录进行远程主机命令的执行，需要ssh私钥进行连接，默对认获取文件地址为：~/.ssh/id_rsa
 
 ## Like Ansible Playbook YAML
 

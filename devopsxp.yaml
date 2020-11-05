@@ -106,6 +106,8 @@ config: # 详细配置信息
     name: image测试
   - include: ./yaml/template.yaml
     name: template测试
+  - include: ./yaml/systemd.yaml
+    name: systemd测试
   - stage: test
     name: Demo测试
     shell: echo 'This is Demo Test!'
