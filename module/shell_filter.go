@@ -72,7 +72,7 @@ func (s *ShellFilter) Process(msgs *Message) *Message {
 				case map[interface{}]interface{}:
 					configs = append(configs, iData.(map[interface{}]interface{}))
 				default:
-					log.Warnf("Include Yaml文件格式不能匹配")
+					log.Warnf("Include Yaml文件格式不能匹配 %v", iData)
 				}
 			}
 		}

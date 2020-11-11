@@ -49,11 +49,10 @@ var shellCmd = &cobra.Command{
 			"host":        args,
 			"remote_user": cliUser,
 			"roles":       []interface{}{"shell"}, // shell role and stage
-			"terminial":   cliTerminial,
 			"vars":        map[string]interface{}{},
 			"hooks":       []interface{}{map[interface{}]interface{}{"type": cliLogout}},
 			"stage":       []interface{}{"shell"},
-			"config":      []interface{}{map[interface{}]interface{}{"stage": "shell", "name": "Shell命令模块", "shell": cliShell}},
+			"config":      []interface{}{map[interface{}]interface{}{"stage": "shell", "name": "Shell命令模块", "shell": cliShell, "terminial": cliTerminial}},
 		}
 
 		config := pipeline.DefaultPipeConfig("cli").

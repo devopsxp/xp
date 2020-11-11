@@ -58,7 +58,6 @@ eg: ./xp cli copy 127.0.0.1 -u lxp -S /tmp/123 -D /tmp/333`,
 			"remote_user": cliUser,
 			"roles":       []interface{}{"copy"},
 			"stage":       []interface{}{"copy"},
-			"terminial":   false,
 			"vars":        map[string]interface{}{},
 			"hooks":       []interface{}{map[interface{}]interface{}{"type": "none"}},
 			"config": []interface{}{map[interface{}]interface{}{

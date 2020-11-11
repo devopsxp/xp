@@ -75,7 +75,6 @@ COMMITINFO: <font color="comment">{{.info}}</font>
 			"remote_user": cliUser,
 			"roles":       []interface{}{"template"},
 			"stage":       []interface{}{"template"},
-			"terminial":   false,
 			"vars":        viper.GetStringMap("vars"),
 			"hooks":       []interface{}{map[interface{}]interface{}{"type": "none"}},
 			"config": []interface{}{map[interface{}]interface{}{

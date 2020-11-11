@@ -18,6 +18,7 @@ const (
 	TemplateType RoleType = "template"
 	IncludeType  RoleType = "include"
 	SystemdType  RoleType = "systemd"
+	UserType     RoleType = "user"
 )
 
 // roles 插件模块名称与类型的映射关系，主要用于通过反射创建roles对象

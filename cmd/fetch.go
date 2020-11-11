@@ -52,7 +52,6 @@ var fetchCmd = &cobra.Command{
 			"remote_user": cliUser,
 			"roles":       []interface{}{"fetch"},
 			"stage":       []interface{}{"fetch"},
-			"terminial":   false,
 			"vars":        map[string]interface{}{},
 			"hooks":       []interface{}{map[interface{}]interface{}{"type": "none"}},
 			"config": []interface{}{map[interface{}]interface{}{

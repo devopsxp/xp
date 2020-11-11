@@ -58,15 +58,17 @@ func (s *SystemdRole) Init(args *RoleArgs) error {
 		s.masked = masked
 	}
 
+	log.Debugf("Systemd %v", s)
+
 	return nil
 }
 
 func (s *SystemdRole) setDaemonreload() error {
 	var err error
 	if s.terminial {
-		err = utils.New(s.host, s.remote_user, "", 22).RunTerminal("systemctl daemon-reload", os.Stdout, os.Stderr)
+		err = utils.New(s.host, s.remote_user, "", 22).RunTerminal("sudo systemctl daemon-reload", os.Stdout, os.Stderr)
 	} else {
-		_, err = utils.New(s.host, s.remote_user, "", 22).Run("systemctl daemon-reload")
+		_, err = utils.New(s.host, s.remote_user, "", 22).Run("sudo systemctl daemon-reload")
 	}
 	return err
 }
@@ -79,9 +81,9 @@ func (s *SystemdRole) setEnable() error {
 	)
 
 	if s.enabled {
-		cmd = fmt.Sprintf("systemctl enable %s", s.service)
+		cmd = fmt.Sprintf("sudo systemctl enable %s", s.service)
 	} else {
-		cmd = fmt.Sprintf("systemctl disable %s", s.service)
+		cmd = fmt.Sprintf("sudo systemctl disable %s", s.service)
 	}
 
 	if s.terminial {
@@ -100,7 +102,7 @@ func (s *SystemdRole) setState() error {
 	)
 	switch s.state {
 	case "start", "stop", "restart", "reload", "status":
-		cmd := fmt.Sprintf("systemctl %s %s", s.state, s.service)
+		cmd := fmt.Sprintf("sudo systemctl %s %s", s.state, s.service)
 		if s.terminial {
 			err = utils.New(s.host, s.remote_user, "", 22).RunTerminal(cmd, os.Stdout, os.Stderr)
 		} else {
@@ -123,6 +125,7 @@ func (s *SystemdRole) Run() error {
 		return errors.New("未提供服务名")
 	}
 
+	// daemonReload适配
 	if s.daemonReload {
 		err := s.setDaemonreload()
 		if err != nil {
@@ -130,6 +133,7 @@ func (s *SystemdRole) Run() error {
 		}
 	}
 
+	// enabled适配
 	if s.enabled {
 		err := s.setEnable()
 		if err != nil {
@@ -137,6 +141,7 @@ func (s *SystemdRole) Run() error {
 		}
 	}
 
+	// state适配
 	if s.state != "" {
 		err := s.setState()
 		if err != nil {
