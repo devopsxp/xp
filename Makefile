@@ -10,6 +10,9 @@ log:
 cli:
 	go build && ./xp cli shell 127.0.0.1-88 -u lxp -a "hostname" -L console
 
+shell:
+	go build && ./xp cli shell 127.0.0.1 -a "for i in {1..100};do date;sleep 1;done" -u lxp -T
+
 systemd:
 	go build && ./xp cli systemd 127.0.0.1 -n docker -s status -u lxp
 
