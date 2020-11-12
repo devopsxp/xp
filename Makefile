@@ -10,6 +10,12 @@ log:
 cli:
 	go build && ./xp cli shell 127.0.0.1-88 -u lxp -a "hostname" -L console
 
+systemd:
+	go build && ./xp cli systemd 127.0.0.1 -n docker -s status -u lxp
+
+script:
+	go build && ./xp cli script 127.0.0.1 -u lxp -a test.sh
+
 copy:
 	touch /tmp/123
 	go build && ./xp cli copy 127.0.0.1 -u lxp -S /tmp/123 -D /tmp/333
