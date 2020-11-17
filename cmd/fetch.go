@@ -50,6 +50,8 @@ var fetchCmd = &cobra.Command{
 		data := map[string]interface{}{
 			"host":        args,
 			"remote_user": cliUser,
+			"remote_pwd":  cliPwd,
+			"remote_port": cliPort,
 			"roles":       []interface{}{"fetch"},
 			"stage":       []interface{}{"fetch"},
 			"vars":        map[string]interface{}{},
@@ -91,7 +93,6 @@ func init() {
 	// is called directly, e.g.:
 	// fetchCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 
-	fetchCmd.Flags().StringVarP(&cliUser, "user", "u", "root", "远程主机执行用户，默认：root")
 	fetchCmd.Flags().StringVarP(&cliSrc, "src", "S", "", "远程目标主机文件 [不是目录]，批量eg: {{.item}}")
 	fetchCmd.Flags().StringVarP(&cliDest, "dest", "D", "", "本地保存文件路径 [不是目录],批量eg: /tmp/{{.item}}")
 	fetchCmd.Flags().StringVarP(&cliItem, "items", "I", "", "批量文件上传,eg: /tmp/1,/usr/kubectl./bin/docker")

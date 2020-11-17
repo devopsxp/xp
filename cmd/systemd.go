@@ -49,6 +49,8 @@ eg: ./xp cli systemd -n docker -s restart -r -e`,
 		data := map[string]interface{}{
 			"host":        args,
 			"remote_user": cliUser,
+			"remote_pwd":  cliPwd,
+			"remote_port": cliPort,
 			"roles":       []interface{}{"systemd"},
 			"stage":       []interface{}{"systemd"},
 			"vars":        map[string]interface{}{},
@@ -92,7 +94,6 @@ func init() {
 	// is called directly, e.g.:
 	// systemdCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 
-	systemdCmd.Flags().StringVarP(&cliUser, "user", "u", "root", "远程主机执行用户，默认：root")
 	systemdCmd.Flags().StringVarP(&systemdService, "name", "n", "", "服务名")
 	systemdCmd.Flags().StringVarP(&systemdState, "state", "s", "", "服务状态，eg: start|stop|status|restart|reload")
 	systemdCmd.Flags().BoolVarP(&systemdReload, "daemonReload", "r", false, "是否systemd daemon-reload")

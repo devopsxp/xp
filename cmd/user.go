@@ -55,6 +55,8 @@ var userCmd = &cobra.Command{
 		data := map[string]interface{}{
 			"host":        args,
 			"remote_user": cliUser,
+			"remote_pwd":  cliPwd,
+			"remote_port": cliPort,
 			"roles":       []interface{}{"user"},
 			"stage":       []interface{}{"user"},
 			"vars":        map[string]interface{}{},
@@ -105,7 +107,6 @@ func init() {
 	// is called directly, e.g.:
 	// userCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 
-	userCmd.Flags().StringVarP(&cliUser, "remote_user", "R", "root", "远程主机执行用户，默认：root")
 	userCmd.Flags().StringVarP(&userName, "user", "U", "", "用户名")
 	userCmd.Flags().StringVarP(&userPassword, "password", "p", "", "修改密码")
 	userCmd.Flags().StringVarP(&userMax, "maximum", "x", "", "两次密码修正的最大天数，后面接数字；仅能root权限操作")

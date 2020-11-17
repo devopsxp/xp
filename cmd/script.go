@@ -43,6 +43,8 @@ var scriptCmd = &cobra.Command{
 		data := map[string]interface{}{
 			"host":        args,
 			"remote_user": cliUser,
+			"remote_pwd":  cliPwd,
+			"remote_port": cliPort,
 			"roles":       []interface{}{"script"},
 			"stage":       []interface{}{"script"},
 			"vars":        map[string]interface{}{},
@@ -82,5 +84,4 @@ func init() {
 	// scriptCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 
 	scriptCmd.Flags().StringVarP(&script, "script", "a", "", "脚本路径")
-	scriptCmd.Flags().StringVarP(&cliUser, "user", "u", "root", "远程主机执行用户，默认：root")
 }
