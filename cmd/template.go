@@ -78,7 +78,7 @@ COMMITINFO: <font color="comment">{{.info}}</font>
 			"roles":       []interface{}{"template"},
 			"stage":       []interface{}{"template"},
 			"vars":        viper.GetStringMap("vars"),
-			"hooks":       []interface{}{map[interface{}]interface{}{"type": "none"}},
+			"hooks":       []interface{}{map[interface{}]interface{}{"type": cliLogout}},
 			"config": []interface{}{map[interface{}]interface{}{
 				"stage": "template",
 				"name":  "模板文件上传",

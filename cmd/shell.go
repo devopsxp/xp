@@ -26,7 +26,6 @@ import (
 var (
 	cliShell     string // shell 命令
 	cliTerminial bool   // 是否交互式执行命令
-	cliLogout    string // 日志输出格式
 )
 
 // shellCmd represents the shell command
@@ -83,6 +82,5 @@ func init() {
 	// shellCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 
 	shellCmd.Flags().StringVarP(&cliShell, "shell", "a", "", "执行命令")
-	shellCmd.Flags().StringVarP(&cliLogout, "logout", "L", "none", "日志格式：console|none|email|wechat|count")
 	shellCmd.Flags().BoolVarP(&cliTerminial, "terminial", "T", false, "是否执行交互式操作")
 }

@@ -55,7 +55,7 @@ var fetchCmd = &cobra.Command{
 			"roles":       []interface{}{"fetch"},
 			"stage":       []interface{}{"fetch"},
 			"vars":        map[string]interface{}{},
-			"hooks":       []interface{}{map[interface{}]interface{}{"type": "none"}},
+			"hooks":       []interface{}{map[interface{}]interface{}{"type": cliLogout}},
 			"config": []interface{}{map[interface{}]interface{}{
 				"stage":      "fetch",
 				"name":       "下载文件模块",

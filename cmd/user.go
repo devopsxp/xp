@@ -60,7 +60,7 @@ var userCmd = &cobra.Command{
 			"roles":       []interface{}{"user"},
 			"stage":       []interface{}{"user"},
 			"vars":        map[string]interface{}{},
-			"hooks":       []interface{}{map[interface{}]interface{}{"type": "none"}},
+			"hooks":       []interface{}{map[interface{}]interface{}{"type": cliLogout}},
 			"config": []interface{}{map[interface{}]interface{}{
 				"stage": "user",
 				"name":  "用户管理",

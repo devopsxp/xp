@@ -48,7 +48,7 @@ var scriptCmd = &cobra.Command{
 			"roles":       []interface{}{"script"},
 			"stage":       []interface{}{"script"},
 			"vars":        map[string]interface{}{},
-			"hooks":       []interface{}{map[interface{}]interface{}{"type": "none"}},
+			"hooks":       []interface{}{map[interface{}]interface{}{"type": cliLogout}},
 			"config": []interface{}{map[interface{}]interface{}{
 				"stage":    "script",
 				"name":     "脚本服务",

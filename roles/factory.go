@@ -157,7 +157,7 @@ func NewShellRole(args *RoleArgs) error {
 				if strings.Contains(err.Error(), "not equal") || strings.Contains(err.Error(), "不在可执行主机范围内") {
 					log.Debugf("%s %v", args.host, err)
 				} else {
-					args.AddCountByName(args.host, "failed")
+					args.AddCountByName(fmt.Sprintf("%s:%d", args.host, args.port), "failed")
 					return err
 				}
 			} else {
@@ -200,17 +200,17 @@ func NewShellRole(args *RoleArgs) error {
 							// 判断是否忽略错误
 							if ignore, ok := config.(map[interface{}]interface{})["ignore"]; ok {
 								if ignore.(bool) {
-									args.AddCountByName(args.host, "ignored")
+									args.AddCountByName(fmt.Sprintf("%s:%d", args.host, args.port), "ignored")
 								} else {
-									args.AddCountByName(args.host, "failed")
+									args.AddCountByName(fmt.Sprintf("%s:%d", args.host, args.port), "failed")
 									return errs
 								}
 							} else {
-								args.AddCountByName(args.host, "failed")
+								args.AddCountByName(fmt.Sprintf("%s:%d", args.host, args.port), "failed")
 								return errs
 							}
 						} else {
-							args.AddCountByName(args.host, "ok")
+							args.AddCountByName(fmt.Sprintf("%s:%d", args.host, args.port), "ok")
 						}
 					} else { // 如果没有设置retry字段
 						err := role.Run()
@@ -218,16 +218,16 @@ func NewShellRole(args *RoleArgs) error {
 							// 判断是否忽略错误
 							if ignore, ok := config.(map[interface{}]interface{})["ignore"]; ok {
 								if ignore.(bool) {
-									args.AddCountByName(args.host, "ignored")
+									args.AddCountByName(fmt.Sprintf("%s:%d", args.host, args.port), "ignored")
 								} else {
-									args.AddCountByName(args.host, "failed")
+									args.AddCountByName(fmt.Sprintf("%s:%d", args.host, args.port), "failed")
 								}
 							} else {
-								args.AddCountByName(args.host, "failed")
+								args.AddCountByName(fmt.Sprintf("%s:%d", args.host, args.port), "failed")
 								return err
 							}
 						} else {
-							args.AddCountByName(args.host, "ok")
+							args.AddCountByName(fmt.Sprintf("%s:%d", args.host, args.port), "ok")
 						}
 					}
 
@@ -244,7 +244,7 @@ func NewShellRole(args *RoleArgs) error {
 					}
 				} else {
 					log.Infof("****************************** SKIP [ITEM: %s %s %s %v]\n", args.host, args.stage, args.user, config)
-					args.AddCountByName(args.host, "skipped")
+					args.AddCountByName(fmt.Sprintf("%s:%d", args.host, args.port), "skipped")
 				}
 			}
 		}

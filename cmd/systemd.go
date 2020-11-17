@@ -54,7 +54,7 @@ eg: ./xp cli systemd -n docker -s restart -r -e`,
 			"roles":       []interface{}{"systemd"},
 			"stage":       []interface{}{"systemd"},
 			"vars":        map[string]interface{}{},
-			"hooks":       []interface{}{map[interface{}]interface{}{"type": "none"}},
+			"hooks":       []interface{}{map[interface{}]interface{}{"type": cliLogout}},
 			"config": []interface{}{map[interface{}]interface{}{
 				"stage": "systemd",
 				"name":  "服务管理",

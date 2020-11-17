@@ -61,7 +61,7 @@ eg: ./xp cli copy 127.0.0.1 -u lxp -S /tmp/123 -D /tmp/333`,
 			"roles":       []interface{}{"copy"},
 			"stage":       []interface{}{"copy"},
 			"vars":        map[string]interface{}{},
-			"hooks":       []interface{}{map[interface{}]interface{}{"type": "none"}},
+			"hooks":       []interface{}{map[interface{}]interface{}{"type": cliLogout}},
 			"config": []interface{}{map[interface{}]interface{}{
 				"stage":      "copy",
 				"name":       "上传文件模块",
