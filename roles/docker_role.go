@@ -20,7 +20,7 @@ func init() {
 Build:
   stage: build
   image: node:8.15.1-jessie
-  script:
+  command:
     - pwd
     - whoami
 
@@ -46,8 +46,8 @@ Build:
 
 type DockerRole struct {
 	RoleLC
-	script []string // 执行脚本命令
-	image  string   // 执行镜像
+	command []string // 执行脚本命令
+	image   string   // 执行镜像
 }
 
 // 准备数据
@@ -66,10 +66,10 @@ func (r *DockerRole) Init(args *RoleArgs) error {
 	// 获取镜像
 	r.image = args.currentConfig["image"].(string)
 
-	// 获取script迭代
-	if sc, ok := args.currentConfig["script"]; ok {
+	// 获取command迭代
+	if sc, ok := args.currentConfig["command"]; ok {
 		for _, it := range sc.([]interface{}) {
-			r.script = append(r.script, it.(string))
+			r.command = append(r.command, it.(string))
 		}
 	}
 
@@ -98,7 +98,7 @@ func (r *DockerRole) Run() error {
 		"OpenStdin":    false,
 		"StdinOnce":    false,
 		"Env":          env,
-		"Cmd":          r.script,
+		"Cmd":          r.command,
 		"Entrypoint":   "",
 		"Image":        r.image,
 		"Volumes": map[string]interface{}{
@@ -158,16 +158,16 @@ func (r *DockerRole) Run() error {
 	rs, err := cli.CreateContainer(data)
 	if err != nil {
 		log.WithFields(log.Fields{
-			"Script": len(r.script),
-			"耗时":     time.Now().Sub(r.starttime),
+			"command": len(r.command),
+			"耗时":      time.Now().Sub(r.starttime),
 		}).Errorln(err.Error())
 		r.logs[fmt.Sprintf("%s %s %s", r.stage, r.host, r.name)] = err.Error()
 		return err
 	}
 
 	log.WithFields(log.Fields{
-		"Script": len(r.script),
-		"耗时":     time.Now().Sub(r.starttime),
+		"command": len(r.command),
+		"耗时":      time.Now().Sub(r.starttime),
 	}).Info(string(rs))
 	r.logs[fmt.Sprintf("%s %s %s", r.stage, r.host, r.name)] = string(rs)
 

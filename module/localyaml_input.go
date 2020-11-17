@@ -76,6 +76,11 @@ func (l *LocalYamlInput) Start() {
 		panic(err)
 	}
 
+	port := viper.GetInt("remote_port")
+	if port <= 0 || port < 22 {
+		port = 22
+	}
+
 	// 目标主机22端口检测并发限制
 	checkchan := make(chan string, 5*runtime.NumCPU())
 
@@ -89,11 +94,11 @@ func (l *LocalYamlInput) Start() {
 		go func(ip string, num int) {
 			defer wg.Done()
 			now := time.Now()
-			if utils.ScanPort(ip, "22") {
-				log.Infof("%d: Ssh check %s success 耗时: %v", num, ip, time.Now().Sub(now))
+			if utils.ScanPort(ip, port) {
+				log.Infof("%d: Ssh check %s:%d success 耗时: %v", num, ip, port, time.Now().Sub(now))
 				l.SetConnectStatus(ip, "success")
 			} else {
-				log.Debugf("%d: Ssh check %s failed 耗时：%v", num, ip, time.Now().Sub(now))
+				log.Infof("%d: Ssh check %s:%d failed 耗时：%v", num, ip, port, time.Now().Sub(now))
 				l.fails += 1
 				l.SetConnectStatus(ip, "failed")
 			}

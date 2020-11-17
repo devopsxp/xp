@@ -47,7 +47,7 @@ func (c *ScriptRole) Init(args *RoleArgs) error {
 // 3. delete script
 func (c *ScriptRole) Run() error {
 	dest := fmt.Sprintf("/tmp/%s", utils.GetRandomSalt())
-	err := utils.New(c.host, c.remote_user, "", 22).SftpUploadToRemote(c.script, dest)
+	err := utils.New(c.host, c.remote_user, c.remote_pwd, c.remote_port).SftpUploadToRemote(c.script, dest)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"src": c.script,
@@ -61,7 +61,7 @@ func (c *ScriptRole) Run() error {
 	} else {
 		cmd := fmt.Sprintf("sh %s", dest)
 		if c.terminial {
-			err = utils.New(c.host, c.remote_user, "", 22).RunTerminal(cmd, os.Stdout, os.Stderr)
+			err = utils.New(c.host, c.remote_user, c.remote_pwd, c.remote_port).RunTerminal(cmd, os.Stdout, os.Stderr)
 			rs := fmt.Sprintf("%s over", c.script)
 			if err != nil {
 				log.WithFields(log.Fields{"耗时": time.Now().Sub(c.starttime)}).Errorln(fmt.Sprintf("[Item: %s] => %s", c.script, err.Error()))
@@ -70,7 +70,7 @@ func (c *ScriptRole) Run() error {
 				log.WithFields(log.Fields{"耗时": time.Now().Sub(c.starttime)}).Info(fmt.Sprintf("[Item: %s] => %s", c.script, rs))
 			}
 		} else {
-			rs, err := utils.New(c.host, c.remote_user, "", 22).Run(cmd)
+			rs, err := utils.New(c.host, c.remote_user, c.remote_pwd, c.remote_port).Run(cmd)
 			if err != nil {
 				log.WithFields(log.Fields{"耗时": time.Now().Sub(c.starttime)}).Errorln(fmt.Sprintf("[Item: %s] => %s", c.script, err.Error()))
 				return err

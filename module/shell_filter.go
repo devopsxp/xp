@@ -81,12 +81,30 @@ func (s *ShellFilter) Process(msgs *Message) *Message {
 	log.Debugln("configs", configs)
 
 	log.Debugf("Config %v\n", configs)
-	var remote_user string
+	var (
+		remote_user, remote_pwd string
+		remote_port             int
+	)
+
 	if user, ok := msgs.Data.Items["remote_user"]; ok {
 		remote_user = user.(string)
 	} else {
 		// 默认root用户
 		remote_user = "root"
+	}
+
+	if pwd, ok := msgs.Data.Items["remote_pwd"]; ok {
+		remote_pwd = pwd.(string)
+	} else {
+		// 默认root用户
+		remote_pwd = ""
+	}
+
+	if port, ok := msgs.Data.Items["remote_port"]; ok {
+		remote_port = port.(int)
+	} else {
+		// 默认root用户
+		remote_port = 22
 	}
 
 	// 全局动态变量
@@ -106,7 +124,7 @@ func (s *ShellFilter) Process(msgs *Message) *Message {
 			for _, stage := range stages {
 				if roles.IsRolesAllow(stage.(string), rolesData) {
 					// 3. TODO: 解析yaml中shell的模块，然后进行匹配
-					err := roles.NewShellRole(roles.NewRoleArgs(stage.(string), remote_user, host, vars, configs, msgs, nil))
+					err := roles.NewShellRole(roles.NewRoleArgs(stage.(string), remote_user, remote_pwd, host, vars, configs, msgs, nil, remote_port))
 					if err != nil {
 						log.Debugln(err.Error())
 						os.Exit(1)

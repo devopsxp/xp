@@ -94,9 +94,9 @@ func (s *UserRole) setDo(cmd string) error {
 		rs  string
 	)
 	if s.terminial {
-		err = utils.New(s.host, s.remote_user, "", 22).RunTerminal(cmd, os.Stdout, os.Stderr)
+		err = utils.New(s.host, s.remote_user, s.remote_pwd, s.remote_port).RunTerminal(cmd, os.Stdout, os.Stderr)
 	} else {
-		_, err = utils.New(s.host, s.remote_user, "", 22).Run(cmd)
+		_, err = utils.New(s.host, s.remote_user, s.remote_pwd, s.remote_port).Run(cmd)
 	}
 
 	if err != nil {

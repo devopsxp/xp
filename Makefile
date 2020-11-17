@@ -8,7 +8,7 @@ log:
 	go build && ./xp playbook -d -l --config  devopsxp.yaml
 
 cli:
-	go build && ./xp cli shell 127.0.0.1-88 -u lxp -a "hostname" -L count 
+	go build && ./xp cli shell 127.0.0.1-88 -u xp -a "hostname" -L count 
 
 shell:
 	go build && ./xp cli shell 127.0.0.1 -a "for i in {1..100};do date;sleep 1;done" -u lxp -T

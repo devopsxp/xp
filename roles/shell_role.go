@@ -61,10 +61,10 @@ func (r *ShellRole) Run() error {
 	if r.items == nil {
 		cmd := fmt.Sprintf("bash -c \"%s\"", r.shell)
 		if r.terminial {
-			err = utils.New(r.host, r.remote_user, "", 22).RunTerminal(cmd, os.Stdout, os.Stderr)
+			err = utils.New(r.host, r.remote_user, r.remote_pwd, r.remote_port).RunTerminal(cmd, os.Stdout, os.Stderr)
 			rs = fmt.Sprintf("%s over", r.shell)
 		} else {
-			rs, err = utils.New(r.host, r.remote_user, "", 22).Run(cmd)
+			rs, err = utils.New(r.host, r.remote_user, r.remote_pwd, r.remote_port).Run(cmd)
 		}
 
 		if err != nil {
@@ -91,10 +91,10 @@ func (r *ShellRole) Run() error {
 			log.Debugf("cmd is %s", cmd)
 
 			if r.terminial {
-				err = utils.New(r.host, r.remote_user, "", 22).RunTerminal(cmd, os.Stdout, os.Stderr)
+				err = utils.New(r.host, r.remote_user, r.remote_pwd, r.remote_port).RunTerminal(cmd, os.Stdout, os.Stderr)
 				rs = fmt.Sprintf("%s over", r.shell)
 			} else {
-				rs, err = utils.New(r.host, r.remote_user, "", 22).Run(cmd)
+				rs, err = utils.New(r.host, r.remote_user, r.remote_pwd, r.remote_port).Run(cmd)
 			}
 
 			if err != nil {

@@ -1,8 +1,9 @@
 - stage: k8s
   name: pod 部署执行测试
-  script:
+  command:
     - echo 'Starting'
     - sleep 1000
+  skip: true
   kubernetes:
     apiVersion: v1 #指定api版本，此值必须在kubectl apiversion中  
     kind: Pod #指定创建资源的角色/类型  

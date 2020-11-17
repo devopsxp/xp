@@ -66,9 +66,9 @@ func (s *SystemdRole) Init(args *RoleArgs) error {
 func (s *SystemdRole) setDaemonreload() error {
 	var err error
 	if s.terminial {
-		err = utils.New(s.host, s.remote_user, "", 22).RunTerminal("sudo systemctl daemon-reload", os.Stdout, os.Stderr)
+		err = utils.New(s.host, s.remote_user, s.remote_pwd, s.remote_port).RunTerminal("sudo systemctl daemon-reload", os.Stdout, os.Stderr)
 	} else {
-		_, err = utils.New(s.host, s.remote_user, "", 22).Run("sudo systemctl daemon-reload")
+		_, err = utils.New(s.host, s.remote_user, s.remote_pwd, s.remote_port).Run("sudo systemctl daemon-reload")
 	}
 	return err
 }
@@ -87,9 +87,9 @@ func (s *SystemdRole) setEnable() error {
 	}
 
 	if s.terminial {
-		err = utils.New(s.host, s.remote_user, "", 22).RunTerminal(cmd, os.Stdout, os.Stderr)
+		err = utils.New(s.host, s.remote_user, s.remote_pwd, s.remote_port).RunTerminal(cmd, os.Stdout, os.Stderr)
 	} else {
-		_, err = utils.New(s.host, s.remote_user, "", 22).Run(cmd)
+		_, err = utils.New(s.host, s.remote_user, s.remote_pwd, s.remote_port).Run(cmd)
 	}
 	return err
 }
@@ -104,9 +104,9 @@ func (s *SystemdRole) setState() error {
 	case "start", "stop", "restart", "reload", "status":
 		cmd := fmt.Sprintf("sudo systemctl %s %s", s.state, s.service)
 		if s.terminial {
-			err = utils.New(s.host, s.remote_user, "", 22).RunTerminal(cmd, os.Stdout, os.Stderr)
+			err = utils.New(s.host, s.remote_user, s.remote_pwd, s.remote_port).RunTerminal(cmd, os.Stdout, os.Stderr)
 		} else {
-			rs, err = utils.New(s.host, s.remote_user, "", 22).Run(cmd)
+			rs, err = utils.New(s.host, s.remote_user, s.remote_pwd, s.remote_port).Run(cmd)
 		}
 		if err != nil {
 			log.WithFields(log.Fields{"耗时": time.Now().Sub(s.starttime)}).Errorln(fmt.Sprintf("[Item: %s] => %s <=> %s", cmd, rs, err.Error()))

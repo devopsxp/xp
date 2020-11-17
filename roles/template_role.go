@@ -59,7 +59,7 @@ func (r *TemplateRole) Run() error {
 
 	log.Debugf("template is %s", destFile)
 
-	err = utils.New(r.host, r.remote_user, "", 22).SftpUploadTemplateString(destFile, r.dest)
+	err = utils.New(r.host, r.remote_user, r.remote_pwd, r.remote_port).SftpUploadTemplateString(destFile, r.dest)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"template": r.src,
