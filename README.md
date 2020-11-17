@@ -66,11 +66,12 @@ xp is my name,but this project is look like ansible-playbook and pipeline togeth
   - [x] 缓存中间产物
   - [x] include命令，允许导入复杂yaml文件夹的大量引用，类似ansible-playbook roles
   - [x] fetch模块
-  - [ ] user模块
+  - [x] user模块
   - [ ] group模块
   - [x] copy模块
   - [ ] yum模块
   - [ ] file模块
+  - [ ] setup模块
 - [x] Debug日志
 - [x] CLI命令行工具(cobra)
 - [ ] 功能文件夹，提供：files、hosts、env等特殊目录模块

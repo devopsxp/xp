@@ -38,6 +38,11 @@ type hook struct {
 func (h *hook) Send(msg *Message) {
 	h.start = time.Now()
 	switch h.Type {
+	case "count":
+		for k, v := range msg.Count {
+			log.Warnf("%s : ok=%d   changed=%d failed=%d  skipped=%d rescued=%d  ignored=%d", k, v["ok"], v["changed"], v["failed"], v["skipped"], v["rescued"], v["ignored"])
+		}
+		log.Warnf("count日志耗时：%v", time.Now().Sub(h.start))
 	case "console":
 		log.Debugf("console hook send %v\n", msg.Data.Check)
 		for k, v := range msg.CallBack {

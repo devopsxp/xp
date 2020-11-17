@@ -26,6 +26,7 @@ type CliInput struct {
 	connectcheck map[string]string
 	lock         sync.RWMutex
 	data         map[string]interface{}
+	faileds      int // 失败次数
 }
 
 func (c *CliInput) Receive() *Message {
@@ -34,7 +35,7 @@ func (c *CliInput) Receive() *Message {
 		return nil
 	}
 
-	return Builder().WithInit().WithCheck(c.connectcheck).WithItemInterface(c.data).Build()
+	return Builder().WithInit(c.faileds).WithCheck(c.connectcheck).WithItemInterface(c.data).Build()
 }
 
 func (c *CliInput) SetConnectStatus(ip, status string) {
@@ -44,6 +45,7 @@ func (c *CliInput) SetConnectStatus(ip, status string) {
 }
 
 func (c *CliInput) Start() {
+	c.faileds = 0
 	c.status = Started
 	log.Debugln("LocalYamlInput plugin started.")
 
@@ -73,6 +75,7 @@ func (c *CliInput) Start() {
 				c.SetConnectStatus(ip, "success")
 			} else {
 				log.Debugf("%d: Ssh check %s failed 耗时：%v", num, ip, time.Now().Sub(now))
+				c.faileds += 1
 				c.SetConnectStatus(ip, "failed")
 			}
 			<-checkchan

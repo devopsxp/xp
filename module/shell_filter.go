@@ -103,9 +103,7 @@ func (s *ShellFilter) Process(msgs *Message) *Message {
 		if status == "failed" {
 			log.Debugf("host %s is failed, next.\n", host)
 		} else {
-
 			for _, stage := range stages {
-				// 判断stage是否允许执行
 				if roles.IsRolesAllow(stage.(string), rolesData) {
 					// 3. TODO: 解析yaml中shell的模块，然后进行匹配
 					err := roles.NewShellRole(roles.NewRoleArgs(stage.(string), remote_user, host, vars, configs, msgs, nil))
@@ -115,6 +113,27 @@ func (s *ShellFilter) Process(msgs *Message) *Message {
 					}
 				}
 			}
+
+			// execChan := make(chan string, runtime.NumCPU())
+			// var w sync.WaitGroup
+			// for _, stage := range stages {
+			// w.Add(1)
+			// execChan <- stage.(string)
+			// go func() {
+			// 	defer w.Done()
+			// 	// 判断stage是否允许执行
+			// 	if roles.IsRolesAllow(stage.(string), rolesData) {
+			// 		// 3. TODO: 解析yaml中shell的模块，然后进行匹配
+			// 		err := roles.NewShellRole(roles.NewRoleArgs(stage.(string), remote_user, host, vars, configs, msgs, nil))
+			// 		if err != nil {
+			// 			log.Debugln(err.Error())
+			// 			os.Exit(1)
+			// 		}
+			// 	}
+			// 	<-execChan
+			// }()
+			// }
+			// w.Wait()
 		}
 	}
 

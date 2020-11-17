@@ -42,6 +42,8 @@ func (c *ConsoleOutput) Send(msgs *Message) {
 			for _, types := range sendtypes.([]interface{}) {
 				if t, ok := types.(map[interface{}]interface{})["type"]; ok {
 					switch t.(string) {
+					case "count":
+						NewHookAdapter(nil).SetType("count").Send(msgs)
 					case "console":
 						NewHookAdapter(nil).SetType("console").Send(msgs)
 					case "email":

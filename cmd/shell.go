@@ -83,6 +83,6 @@ func init() {
 
 	shellCmd.Flags().StringVarP(&cliShell, "shell", "a", "", "执行命令")
 	shellCmd.Flags().StringVarP(&cliUser, "user", "u", "root", "远程主机执行用户，默认：root")
-	shellCmd.Flags().StringVarP(&cliLogout, "logout", "L", "none", "日志格式：console|none|email|wechat")
+	shellCmd.Flags().StringVarP(&cliLogout, "logout", "L", "none", "日志格式：console|none|email|wechat|count")
 	shellCmd.Flags().BoolVarP(&cliTerminial, "terminial", "T", false, "是否执行交互式操作")
 }

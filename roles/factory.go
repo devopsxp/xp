@@ -78,6 +78,30 @@ type RoleArgs struct {
 	hook              *Hook
 }
 
+func (r *RoleArgs) AddCountByName(ip, item string) error {
+	if data, ok := r.msg.Count[ip]; ok {
+		if _, ok = data[item]; ok {
+			data[item] = data[item] + 1
+			r.msg.Count[ip] = data
+		} else {
+			return errors.New(fmt.Sprintf("%s in Count not exist", item))
+		}
+	} else {
+		tmp := map[string]int{
+			"ok":      0,
+			"changed": 0,
+			"failed":  0,
+			"skipped": 0,
+			"rescued": 0,
+			"ignored": 0,
+		}
+
+		tmp[item] = 1
+		r.msg.Count[ip] = tmp
+	}
+	return nil
+}
+
 func NewRoleArgs(stage, user, host string, vars map[string]interface{}, configs []interface{}, msg *Message, hook *Hook) *RoleArgs {
 	return &RoleArgs{
 		stage:   stage,
@@ -130,51 +154,94 @@ func NewShellRole(args *RoleArgs) error {
 				if strings.Contains(err.Error(), "not equal") || strings.Contains(err.Error(), "不在可执行主机范围内") {
 					log.Debugf("%s %v", args.host, err)
 				} else {
+					args.AddCountByName(args.host, "failed")
 					return err
 				}
 			} else {
-				// 执行Role
-				role.Pre()
-				role.Before()
-				// 处理重试逻辑
-				if retry, ok := config.(map[interface{}]interface{})["retry"]; ok {
-					for i := 0; i < retry.(int); i++ {
-						err := role.Run()
-						if err != nil {
-							log.Warningf("重试第 %d 次，主机: %s Stage: %s User: %s 错误信息： %s", i, args.host, args.stage, args.user, err.Error())
-							if i+1 == retry {
-								log.Errorf("重试次数 %d 完毕，未能执行完成，错误信息: %s", i, err.Error())
-								return err
-							}
-							// 重试等待时间
-							if retryWait, ok := config.(map[interface{}]interface{})["retryWait"]; ok {
-								log.Warnf("重试等待时间: %d 秒", retryWait.(int))
-								time.Sleep(time.Duration(retryWait.(int)) * time.Second)
-							} else {
-								log.Warnln("重试等待时间: 3 秒")
-								time.Sleep(3 * time.Second)
-							}
-						} else {
-							break
-						}
-					}
-				} else { // 如果没有设置retry字段
-					err := role.Run()
-					if err != nil {
-						return err
-					}
+				var skip bool
+				// skip 机制
+				if sk, ok := config.(map[interface{}]interface{})["skip"]; ok {
+					skip = sk.(bool)
+				} else {
+					skip = false
 				}
 
-				role.After()
+				if !skip {
+					// 执行Role
+					role.Pre()
+					role.Before()
+					// 处理重试逻辑
+					if retry, ok := config.(map[interface{}]interface{})["retry"]; ok {
+						var errs error
+						for i := 0; i < retry.(int); i++ {
+							errs = role.Run()
+							if errs != nil {
+								log.Warningf("重试第 %d 次，主机: %s Stage: %s User: %s 错误信息： %s", i, args.host, args.stage, args.user, errs.Error())
+								if i+1 == retry {
+									log.Errorf("重试次数 %d 完毕，未能执行完成，错误信息: %s", i, errs.Error())
+								}
+								// 重试等待时间
+								if retryWait, ok := config.(map[interface{}]interface{})["wait"]; ok {
+									log.Warnf("重试等待时间: %d 秒", retryWait.(int))
+									time.Sleep(time.Duration(retryWait.(int)) * time.Second)
+								} else {
+									log.Warnln("重试等待时间: 3 秒")
+									time.Sleep(3 * time.Second)
+								}
+							} else {
+								break
+							}
+						}
 
-				// Role钩子函数 自定义hook
-				// @Param 实现里RolePlugin接口的实例
-				ishook := role.IsHook()
-				if ishook {
-					err = role.Hooks()
-					if err != nil {
-						return err
+						if errs != nil {
+							// 判断是否忽略错误
+							if ignore, ok := config.(map[interface{}]interface{})["ignore"]; ok {
+								if ignore.(bool) {
+									args.AddCountByName(args.host, "ignored")
+								} else {
+									args.AddCountByName(args.host, "failed")
+									return errs
+								}
+							} else {
+								args.AddCountByName(args.host, "failed")
+								return errs
+							}
+						} else {
+							args.AddCountByName(args.host, "ok")
+						}
+					} else { // 如果没有设置retry字段
+						err := role.Run()
+						if err != nil {
+							// 判断是否忽略错误
+							if ignore, ok := config.(map[interface{}]interface{})["ignore"]; ok {
+								if ignore.(bool) {
+									args.AddCountByName(args.host, "ignored")
+								} else {
+									args.AddCountByName(args.host, "failed")
+								}
+							} else {
+								args.AddCountByName(args.host, "failed")
+								return err
+							}
+						} else {
+							args.AddCountByName(args.host, "ok")
+						}
 					}
+
+					role.After()
+
+					// Role钩子函数 自定义hook
+					// @Param 实现里RolePlugin接口的实例
+					ishook := role.IsHook()
+					if ishook {
+						err = role.Hooks()
+						if err != nil {
+							return err
+						}
+					}
+				} else {
+					log.Infof("****************************** SKIP [ITEM: %s %s %s %v]\n", args.host, args.stage, args.user, config)
+					args.AddCountByName(args.host, "skipped")
 				}
 			}
 		}

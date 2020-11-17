@@ -80,7 +80,7 @@ func (p *Pipeline) Exec() {
 
 // 启动的顺序 output -> filter -> input -> check
 func (p *Pipeline) Start() {
-	p.spinner.Start()
+	// p.spinner.Start()
 	p.output.Start()
 	p.filter.Start()
 	p.input.Start()
@@ -91,7 +91,7 @@ func (p *Pipeline) Start() {
 
 // 停止的顺序 check -> input -> filter -> output
 func (p *Pipeline) Stop() {
-	defer p.spinner.Stop()
+	// defer p.spinner.Stop()
 	// p.check.Stop()
 	p.input.Stop()
 	p.filter.Stop()
@@ -106,7 +106,7 @@ func (p *Pipeline) Status() plugin.StatusPlugin {
 }
 
 func (p *Pipeline) Init() {
-	p.spinner = spinner.New(spinner.CharSets[38], 100*time.Millisecond)
+	// p.spinner = spinner.New(spinner.CharSets[38], 100*time.Millisecond)
 	p.start = time.Now()
 	// p.check.Init()
 	p.input.Init(p.tmpargs)

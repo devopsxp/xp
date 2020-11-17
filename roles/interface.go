@@ -132,7 +132,7 @@ func (r *RoleLC) Pre() {
 // 执行前
 func (r *RoleLC) Before() {
 	log.Debugf("Role module %s Before running.", r.name)
-	log.Infof("******************************************************** TASK [%s : %s] BY %s@%s ********************************************************\n", r.stage, r.name, r.remote_user, r.host)
+	log.Infof("******************************************************** TASK [%s : %s] BY %s@%s \n", r.stage, r.name, r.remote_user, r.host)
 }
 
 // 执行环节

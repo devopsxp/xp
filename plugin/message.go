@@ -15,6 +15,7 @@ type Message struct {
 	Data     *Data
 	Status   StatusType
 	CallBack map[string]map[string]string // 执行返回结果
+	Count    map[string]map[string]int    // 统计执行情况
 }
 
 type Env struct {
@@ -51,10 +52,11 @@ func (b *builder) WithRaw(info string) *builder {
 	return b
 }
 
-func (b *builder) WithInit() *builder {
+func (b *builder) WithInit(failed int) *builder {
 	b.once.Do(func() {
 		b.msg.CallBack = make(map[string]map[string]string)
 		b.msg.Data.Items = make(map[string]interface{})
+		b.msg.Count = make(map[string]map[string]int)
 	})
 	return b
 }

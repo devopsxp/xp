@@ -34,4 +34,6 @@
   - docker images
   - docker ps
   retry: 3
-  terminial: true # ssh 是否交互式执行
+  wait: 1
+  terminial: false # ssh 是否交互式执行
+  ignore: true

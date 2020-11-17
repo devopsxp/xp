@@ -45,6 +45,7 @@ type LocalYamlInput struct {
 	yaml       LocalYaml
 	connecheck map[string]string
 	lock       sync.RWMutex
+	fails      int // ssh连接失败数
 }
 
 func (l *LocalYamlInput) Receive() *Message {
@@ -55,7 +56,7 @@ func (l *LocalYamlInput) Receive() *Message {
 		return nil
 	}
 
-	return Builder().WithInit().WithCheck(l.connecheck).WithItemInterface(l.yaml.data).Build()
+	return Builder().WithInit(l.fails).WithCheck(l.connecheck).WithItemInterface(l.yaml.data).Build()
 }
 
 func (l *LocalYamlInput) SetConnectStatus(ip, status string) {
@@ -65,6 +66,7 @@ func (l *LocalYamlInput) SetConnectStatus(ip, status string) {
 }
 
 func (l *LocalYamlInput) Start() {
+	l.fails = 0
 	l.status = Started
 	log.Debugln("LocalYamlInput plugin started.")
 
@@ -92,6 +94,7 @@ func (l *LocalYamlInput) Start() {
 				l.SetConnectStatus(ip, "success")
 			} else {
 				log.Debugf("%d: Ssh check %s failed 耗时：%v", num, ip, time.Now().Sub(now))
+				l.fails += 1
 				l.SetConnectStatus(ip, "failed")
 			}
 			<-checkchan
