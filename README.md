@@ -101,6 +101,7 @@ xp is my name,but this project is look like ansible-playbook and pipeline togeth
   - [ ] k8s support
     - [x] yaml新增k8s字段
     - [ ] k8s agent/operator
+    - [ ] pod all in one
   - [ ] ssh + docker support
   - [ ] 中间产物缓存
 
