@@ -37,7 +37,7 @@ func (s *SshCheck) Conn() *Message {
 	message := Builder().WithRaw("{'name':'xp'}").WithTarget(ip)
 
 	for _, i := range ip {
-		if utils.ScanPort(i, "22") {
+		if utils.ScanPort(i, 22) {
 			fmt.Printf("%s:22 is success\n", i)
 			message.WithStatus(Ok).WithItems(i, "success")
 		} else {

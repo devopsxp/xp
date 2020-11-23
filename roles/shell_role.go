@@ -19,9 +19,8 @@ func init() {
 
 type ShellRole struct {
 	RoleLC
-	shell       string   // 原生命令
-	items       []string // 多命令集合
-	isTerminial bool     // 是否交互式执行
+	shell string   // 原生命令
+	items []string // 多命令集合
 }
 
 // 准备数据
@@ -36,8 +35,6 @@ func (r *ShellRole) Init(args *RoleArgs) error {
 	if err != nil {
 		return err
 	}
-
-	r.isTerminial = args.isTerminial
 
 	// 获取原始shell命令
 	r.shell = args.currentConfig["shell"].(string)
@@ -63,11 +60,11 @@ func (r *ShellRole) Run() error {
 	)
 	if r.items == nil {
 		cmd := fmt.Sprintf("bash -c \"%s\"", r.shell)
-		if r.isTerminial {
-			err = utils.New(r.host, r.remote_user, "", 22).RunTerminal(cmd, os.Stdout, os.Stderr)
+		if r.terminial {
+			err = utils.New(r.host, r.remote_user, r.remote_pwd, r.remote_port).RunTerminal(cmd, os.Stdout, os.Stderr)
 			rs = fmt.Sprintf("%s over", r.shell)
 		} else {
-			rs, err = utils.New(r.host, r.remote_user, "", 22).Run(cmd)
+			rs, err = utils.New(r.host, r.remote_user, r.remote_pwd, r.remote_port).Run(cmd)
 		}
 
 		if err != nil {
@@ -93,11 +90,11 @@ func (r *ShellRole) Run() error {
 			}
 			log.Debugf("cmd is %s", cmd)
 
-			if r.isTerminial {
-				err = utils.New(r.host, r.remote_user, "", 22).RunTerminal(cmd, os.Stdout, os.Stderr)
+			if r.terminial {
+				err = utils.New(r.host, r.remote_user, r.remote_pwd, r.remote_port).RunTerminal(cmd, os.Stdout, os.Stderr)
 				rs = fmt.Sprintf("%s over", r.shell)
 			} else {
-				rs, err = utils.New(r.host, r.remote_user, "", 22).Run(cmd)
+				rs, err = utils.New(r.host, r.remote_user, r.remote_pwd, r.remote_port).Run(cmd)
 			}
 
 			if err != nil {
@@ -109,6 +106,7 @@ func (r *ShellRole) Run() error {
 					log.WithFields(log.Fields{"耗时": time.Now().Sub(r.starttime)}).Errorln(fmt.Sprintf("[序号: %d Item: %s] => %s", n, cmd, err.Error()))
 				}
 				// return errors.New(fmt.Sprintf("%s | %s | %s | %s => %s %s", r.host, r.stage, r.name, cmd, rs, err.Error()))
+				return err
 			} else {
 				log.WithFields(log.Fields{"耗时": time.Now().Sub(r.starttime)}).Info(fmt.Sprintf("[序号: %d Item: %s] => %s", n, cmd, rs))
 				r.logs[fmt.Sprintf("%s %s %s", r.stage, r.host, r.name)] = rs

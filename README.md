@@ -56,7 +56,7 @@ xp is my name,but this project is look like ansible-playbook and pipeline togeth
   - [x] 识别shell_role中shell、copy、template等三级模块
   - [x] go template support
   - [ ] docker support
-  - [ ] systemd support（服务管理）
+  - [x] systemd support（服务管理）
   - [ ] k8s support
   - [ ] ssh + docker support
   - [x] Hooks钩子函数支撑output plugin输出，目前支持console、email、wechat，todo： phone、sms、elasticsearch、log
@@ -66,30 +66,44 @@ xp is my name,but this project is look like ansible-playbook and pipeline togeth
   - [x] 缓存中间产物
   - [x] include命令，允许导入复杂yaml文件夹的大量引用，类似ansible-playbook roles
   - [x] fetch模块
-  - [ ] user模块
+  - [x] user模块
   - [ ] group模块
   - [x] copy模块
   - [ ] yum模块
   - [ ] file模块
+  - [ ] setup模块
 - [x] Debug日志
 - [x] CLI命令行工具(cobra)
 - [ ] 功能文件夹，提供：files、hosts、env等特殊目录模块
 - [ ] roles ansible模块
+  - [x] yaml目录通过include模块引入
 - [ ] module man模块说明文档
 - [x] module plugin插件机制
 - [ ] ssh [连接功能](https://github.com/mojocn/felix)
 - [x] 各个步骤的计时器和总执行计时
-- [ ] Retry重试机制
+- [x] Retry重试机制
   - [x] 超时重试
   - [x] 错误重试
+- [x] 消息发送
+  - [x] 邮件
+  - [x] 企业微信/叮叮 
+  - [x] 短信
+- [ ] 中间件对接
+  - [ ] sonarque
+  - [ ] jmeter
+  - [ ] jenkins
+  - [ ] 安全扫描
+  - [ ] ArgoCD
 - [ ] 容器化
   - [ ] docker support
-    - [ ] yaml新增images字段
+    - [x] yaml新增images字段
     - [ ] [Remote API](https://docs.docker.com/engine/api/v1.24/)
   - [ ] k8s support
-    - [ ] yaml新增k8s字段
+    - [x] yaml新增k8s字段
     - [ ] k8s agent/operator
+    - [ ] pod all in one
   - [ ] ssh + docker support
+  - [ ] 中间产物缓存
 
 
 # Useage
@@ -124,7 +138,7 @@ cli -> main.go -> root.go -> test.go -> pipeline -> init -> start -> check(ssh) 
 
 # 配置信息
 
-本工具采用ssh免密登录进行远程主机命令的执行，需要ssh私钥进行连接，默认获取文件地址为：~/.ssh/id_rsa
+本工具采用ssh免密登录进行远程主机命令的执行，需要ssh私钥进行连接，默对认获取文件地址为：~/.ssh/id_rsa
 
 ## Like Ansible Playbook YAML
 
@@ -355,9 +369,6 @@ COMMITINFO: <font color="comment">{{.info}}</font>
   * inputPlugin
   * 匹配数据
   * pipeline
-2. cli module分离命令 [cobra add shell -p cliCmd]
-3. logours 格式标准化 [ansible]
-4. systemd 服务管理模块
+2. systemd 服务管理模块
   * 匹配目标主机os系统
   * 根据目标主机服务管理方式进行service管理服务启停
-5. [ansible模块汇总(https://blog.csdn.net/qq_34646546/article/details/86606408)

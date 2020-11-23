@@ -56,11 +56,12 @@ eg: ./xp cli copy 127.0.0.1 -u lxp -S /tmp/123 -D /tmp/333`,
 		data := map[string]interface{}{
 			"host":        args,
 			"remote_user": cliUser,
+			"remote_pwd":  cliPwd,
+			"remote_port": cliPort,
 			"roles":       []interface{}{"copy"},
 			"stage":       []interface{}{"copy"},
-			"terminial":   false,
 			"vars":        map[string]interface{}{},
-			"hooks":       []interface{}{map[interface{}]interface{}{"type": "none"}},
+			"hooks":       []interface{}{map[interface{}]interface{}{"type": cliLogout}},
 			"config": []interface{}{map[interface{}]interface{}{
 				"stage":      "copy",
 				"name":       "上传文件模块",
@@ -98,7 +99,6 @@ func init() {
 	// is called directly, e.g.:
 	// copyCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 
-	copyCmd.Flags().StringVarP(&cliUser, "user", "u", "root", "远程主机执行用户，默认：root")
 	copyCmd.Flags().StringVarP(&cliSrc, "src", "S", "", "原路径，批量eg: {{.item}}")
 	copyCmd.Flags().StringVarP(&cliDest, "dest", "D", "", "目的路径,批量eg: /tmp/{{.item}}")
 	copyCmd.Flags().StringVarP(&cliItem, "items", "I", "", "批量文件上传,eg: /tmp/1,/usr/kubectl./bin/docker")

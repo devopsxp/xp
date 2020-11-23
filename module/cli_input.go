@@ -26,6 +26,7 @@ type CliInput struct {
 	connectcheck map[string]string
 	lock         sync.RWMutex
 	data         map[string]interface{}
+	faileds      int // 失败次数
 }
 
 func (c *CliInput) Receive() *Message {
@@ -34,7 +35,7 @@ func (c *CliInput) Receive() *Message {
 		return nil
 	}
 
-	return Builder().WithInit().WithCheck(c.connectcheck).WithItemInterface(c.data).Build()
+	return Builder().WithInit(c.faileds).WithCheck(c.connectcheck).WithItemInterface(c.data).Build()
 }
 
 func (c *CliInput) SetConnectStatus(ip, status string) {
@@ -44,6 +45,7 @@ func (c *CliInput) SetConnectStatus(ip, status string) {
 }
 
 func (c *CliInput) Start() {
+	c.faileds = 0
 	c.status = Started
 	log.Debugln("LocalYamlInput plugin started.")
 
@@ -52,6 +54,13 @@ func (c *CliInput) Start() {
 	ips, err := getips(c.data["host"].([]string))
 	if err != nil {
 		panic(err)
+	}
+
+	var port int
+	if pt, ok := c.data["remote_port"]; ok {
+		port = pt.(int)
+	} else {
+		port = 22
 	}
 
 	// 目标主机22端口检测并发限制
@@ -68,11 +77,12 @@ func (c *CliInput) Start() {
 		go func(ip string, num int) {
 			defer wg.Done()
 			now := time.Now()
-			if utils.ScanPort(ip, "22") {
-				log.Infof("%d: Ssh check %s success 耗时: %v", num, ip, time.Now().Sub(now))
+			if utils.ScanPort(ip, port) {
+				log.Infof("%d: Ssh check %s:%d success 耗时: %v", num, ip, port, time.Now().Sub(now))
 				c.SetConnectStatus(ip, "success")
 			} else {
-				log.Debugf("%d: Ssh check %s failed 耗时：%v", num, ip, time.Now().Sub(now))
+				log.Infof("%d: Ssh check %s:%d failed 耗时：%v", num, ip, port, time.Now().Sub(now))
+				c.faileds += 1
 				c.SetConnectStatus(ip, "failed")
 			}
 			<-checkchan

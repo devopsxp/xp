@@ -48,13 +48,16 @@ type RoleLC struct {
 	// 通用字段
 	stage       string
 	remote_user string                 // 执行用户
+	remote_pwd  string                 // 执行用户密码（非必须）
+	remote_port int                    // ssh端口
 	vars        map[string]interface{} // 环境变量
 	host        string                 // 执行的目标机
 	starttime   time.Time              // 计算执行时间之开始时间
 	hook        *Hook
 	// 上下文
-	msg  *Message
-	logs map[string]string // 命令执行日志
+	msg       *Message
+	logs      map[string]string // 命令执行日志
+	terminial bool              // ssh 是否交互式执行
 }
 
 // common 公共初始化函数
@@ -80,6 +83,8 @@ func (r *RoleLC) Common(args *RoleArgs) error {
 	// 上下文消息传递
 	r.msg = args.msg
 	r.remote_user = args.user
+	r.remote_pwd = args.pwd
+	r.remote_port = args.port
 	r.stage = args.stage
 	r.vars = args.vars
 
@@ -99,6 +104,13 @@ func (r *RoleLC) Common(args *RoleArgs) error {
 	} else {
 		// 没有设置tags标签，表示不限制主机执行
 		isTags = true
+	}
+
+	// 每个config shell terminial 是否交互式执行
+	if terminial, ok := args.currentConfig["terminial"]; ok {
+		r.terminial = terminial.(bool)
+	} else {
+		r.terminial = false
 	}
 
 	if !isTags {
@@ -124,7 +136,7 @@ func (r *RoleLC) Pre() {
 // 执行前
 func (r *RoleLC) Before() {
 	log.Debugf("Role module %s Before running.", r.name)
-	log.Infof("******************************************************** TASK [%s : %s] BY %s@%s ********************************************************\n", r.stage, r.name, r.remote_user, r.host)
+	log.Infof("******************************************************** TASK [%s : %s] BY %s@%s \n", r.stage, r.name, r.remote_user, r.host)
 }
 
 // 执行环节

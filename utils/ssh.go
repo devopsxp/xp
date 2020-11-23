@@ -295,7 +295,7 @@ func (c *Cli) RunTerminal(shell string, stdout, stderr io.Writer) error {
 	fd := int(os.Stdin.Fd())
 	oldState, err := terminal.MakeRaw(fd)
 	if err != nil {
-		panic(err)
+		return err
 	}
 	defer terminal.Restore(fd, oldState)
 
@@ -305,11 +305,11 @@ func (c *Cli) RunTerminal(shell string, stdout, stderr io.Writer) error {
 
 	termWidth, termHeight, err := terminal.GetSize(fd)
 	if err != nil {
-		panic(err)
+		return err
 	}
 	// Set up terminal modes
 	modes := ssh.TerminalModes{
-		ssh.ECHO:          1,     // enable echoing
+		ssh.ECHO:          0,     // enable echoing
 		ssh.TTY_OP_ISPEED: 14400, // input speed = 14.4kbaud
 		ssh.TTY_OP_OSPEED: 14400, // output speed = 14.4kbaud
 	}
@@ -319,6 +319,6 @@ func (c *Cli) RunTerminal(shell string, stdout, stderr io.Writer) error {
 		return err
 	}
 
-	session.Run(shell)
-	return nil
+	err = session.Run(shell)
+	return err
 }

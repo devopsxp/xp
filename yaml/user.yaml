@@ -1,0 +1,16 @@
+- stage: user
+  name: 测试user模块
+  user:
+    name: lxp
+    password: "" 
+    delete: false # 删除用户
+    lock: false # 锁住用户无权更改密码
+    unlock: false # 解除锁定
+    force: false # 强制操作
+    maximum: 0 # 两次密码修正的最大天数，后面接数字；仅能root权限操作；
+    minimum: 0 # 两次密码修改的最小天数，后面接数字，仅能root权限操作；
+    warning: 0 # 在距多少天提醒用户修改密码；仅能root权限操作
+    inactive: 0 # 在密码过期后多少天，用户被禁掉，仅能以root操作；
+    status: true # 查询用户的密码状态，仅能root用户操作；
+  terminial: true
+  skip: true

@@ -26,8 +26,6 @@ import (
 var (
 	cliShell     string // shell 命令
 	cliTerminial bool   // 是否交互式执行命令
-	cliLogout    string // 日志输出格式
-	cliUser      string // 远程执行用户
 )
 
 // shellCmd represents the shell command
@@ -48,12 +46,13 @@ var shellCmd = &cobra.Command{
 		data := map[string]interface{}{
 			"host":        args,
 			"remote_user": cliUser,
+			"remote_pwd":  cliPwd,
+			"remote_port": cliPort,
 			"roles":       []interface{}{"shell"}, // shell role and stage
-			"terminial":   cliTerminial,
 			"vars":        map[string]interface{}{},
 			"hooks":       []interface{}{map[interface{}]interface{}{"type": cliLogout}},
 			"stage":       []interface{}{"shell"},
-			"config":      []interface{}{map[interface{}]interface{}{"stage": "shell", "name": "Shell命令模块", "shell": cliShell}},
+			"config":      []interface{}{map[interface{}]interface{}{"stage": "shell", "name": "Shell命令模块", "shell": cliShell, "terminial": cliTerminial}},
 		}
 
 		config := pipeline.DefaultPipeConfig("cli").
@@ -83,7 +82,5 @@ func init() {
 	// shellCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 
 	shellCmd.Flags().StringVarP(&cliShell, "shell", "a", "", "执行命令")
-	shellCmd.Flags().StringVarP(&cliUser, "user", "u", "root", "远程主机执行用户，默认：root")
-	shellCmd.Flags().StringVarP(&cliLogout, "logout", "L", "none", "日志格式：console|none|email|wechat")
 	shellCmd.Flags().BoolVarP(&cliTerminial, "terminial", "T", false, "是否执行交互式操作")
 }

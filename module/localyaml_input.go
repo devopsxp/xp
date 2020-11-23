@@ -45,6 +45,7 @@ type LocalYamlInput struct {
 	yaml       LocalYaml
 	connecheck map[string]string
 	lock       sync.RWMutex
+	fails      int // ssh连接失败数
 }
 
 func (l *LocalYamlInput) Receive() *Message {
@@ -55,7 +56,7 @@ func (l *LocalYamlInput) Receive() *Message {
 		return nil
 	}
 
-	return Builder().WithInit().WithCheck(l.connecheck).WithItemInterface(l.yaml.data).Build()
+	return Builder().WithInit(l.fails).WithCheck(l.connecheck).WithItemInterface(l.yaml.data).Build()
 }
 
 func (l *LocalYamlInput) SetConnectStatus(ip, status string) {
@@ -65,6 +66,7 @@ func (l *LocalYamlInput) SetConnectStatus(ip, status string) {
 }
 
 func (l *LocalYamlInput) Start() {
+	l.fails = 0
 	l.status = Started
 	log.Debugln("LocalYamlInput plugin started.")
 
@@ -72,6 +74,11 @@ func (l *LocalYamlInput) Start() {
 	ips, err := getips(viper.GetStringSlice("host"))
 	if err != nil {
 		panic(err)
+	}
+
+	port := viper.GetInt("remote_port")
+	if port <= 0 || port < 22 {
+		port = 22
 	}
 
 	// 目标主机22端口检测并发限制
@@ -87,11 +94,12 @@ func (l *LocalYamlInput) Start() {
 		go func(ip string, num int) {
 			defer wg.Done()
 			now := time.Now()
-			if utils.ScanPort(ip, "22") {
-				log.Infof("%d: Ssh check %s success 耗时: %v", num, ip, time.Now().Sub(now))
+			if utils.ScanPort(ip, port) {
+				log.Infof("%d: Ssh check %s:%d success 耗时: %v", num, ip, port, time.Now().Sub(now))
 				l.SetConnectStatus(ip, "success")
 			} else {
-				log.Debugf("%d: Ssh check %s failed 耗时：%v", num, ip, time.Now().Sub(now))
+				log.Infof("%d: Ssh check %s:%d failed 耗时：%v", num, ip, port, time.Now().Sub(now))
+				l.fails += 1
 				l.SetConnectStatus(ip, "failed")
 			}
 			<-checkchan

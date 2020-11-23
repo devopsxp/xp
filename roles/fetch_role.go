@@ -54,7 +54,7 @@ func (c *FetchRole) Init(args *RoleArgs) error {
 func (c *FetchRole) Run() error {
 	var err error
 	if c.items == nil {
-		err := utils.New(c.host, c.remote_user, "", 22).SftpDownloadToLocal(c.dest, c.src)
+		err := utils.New(c.host, c.remote_user, c.remote_pwd, c.remote_port).SftpDownloadToLocal(c.dest, c.src)
 		if err != nil {
 			log.WithFields(log.Fields{
 				"src":  c.src,
@@ -84,7 +84,7 @@ func (c *FetchRole) Run() error {
 				panic(err)
 			}
 			dest, err := utils.ApplyTemplate(c.dest, map[string]interface{}{"item": it})
-			err = utils.New(c.host, c.remote_user, "", 22).SftpDownloadToLocal(dest, src)
+			err = utils.New(c.host, c.remote_user, c.remote_pwd, c.remote_port).SftpDownloadToLocal(dest, src)
 			if err != nil {
 				log.WithFields(log.Fields{
 					"src":  src,

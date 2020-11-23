@@ -1,9 +1,11 @@
 host: # 目标主机
-  - 127.0.0.1
+  - 127.0.0.1-2
   # - 192.168.0.1-20
-remote_user: lxp 
-terminial: false
+remote_user: root # 不设置默认用root用户
+remote_pwd: "" # 不设置pwd 则默认用ssh key登录
+remote_port: 22 # 不设置默认走22端口
 roles: # 执行具体stage
+  - user
   - vim-go
   - build
   - test
@@ -40,7 +42,7 @@ vars: # 环境变量 默认会将所有Key转换未小写字母，请写模板�
         node: 127.0.0.1
         threshold_value: 88
 hooks: # 消息发送 全局一个 可以一次发送所有结果到多个渠道
-  - type: none # 类型，支持：console|email|wechat|phone|sms
+  - type: count # 类型，支持：console|email|wechat|phone|sms|count
 #   - type: email
 #     alias: xp战队 # 邮箱昵称
 #     email_user: "xp@xp.com"
@@ -95,10 +97,13 @@ hooks: # 消息发送 全局一个 可以一次发送所有结果到多个渠道
   # - type: phone
   # - type: sms
 stage: # 流程步骤
+  - user
   - vim-go
   - build
   - test
 config: # 详细配置信息
+  - include: ./yaml/user.yaml
+    name: user测试
   - include: ./yaml/shell.yaml
     name: shell测试
   - include: ./yaml/copy.yaml
@@ -107,6 +112,8 @@ config: # 详细配置信息
     name: image测试
   - include: ./yaml/template.yaml
     name: template测试
+  - include: ./yaml/systemd.yaml
+    name: systemd测试
   - stage: test
     name: Demo测试
     shell: echo 'This is Demo Test!'

@@ -19,8 +19,7 @@ func init() {
 // shell 命令运行filter插件
 type ShellFilter struct {
 	LifeCycle
-	status    StatusPlugin
-	terminial bool
+	status StatusPlugin
 }
 
 func (s *ShellFilter) Process(msgs *Message) *Message {
@@ -73,7 +72,7 @@ func (s *ShellFilter) Process(msgs *Message) *Message {
 				case map[interface{}]interface{}:
 					configs = append(configs, iData.(map[interface{}]interface{}))
 				default:
-					log.Warnf("Include Yaml文件格式不能匹配")
+					log.Warnf("Include Yaml文件格式不能匹配 %v", iData)
 				}
 			}
 		}
@@ -81,18 +80,31 @@ func (s *ShellFilter) Process(msgs *Message) *Message {
 
 	log.Debugln("configs", configs)
 
-	// 解析terminial
-	if terminial, ok := msgs.Data.Items["terminial"]; ok {
-		s.terminial = terminial.(bool)
-	}
-
 	log.Debugf("Config %v\n", configs)
-	var remote_user string
+	var (
+		remote_user, remote_pwd string
+		remote_port             int
+	)
+
 	if user, ok := msgs.Data.Items["remote_user"]; ok {
 		remote_user = user.(string)
 	} else {
 		// 默认root用户
 		remote_user = "root"
+	}
+
+	if pwd, ok := msgs.Data.Items["remote_pwd"]; ok {
+		remote_pwd = pwd.(string)
+	} else {
+		// 默认root用户
+		remote_pwd = ""
+	}
+
+	if port, ok := msgs.Data.Items["remote_port"]; ok {
+		remote_port = port.(int)
+	} else {
+		// 默认root用户
+		remote_port = 22
 	}
 
 	// 全局动态变量
@@ -109,18 +121,37 @@ func (s *ShellFilter) Process(msgs *Message) *Message {
 		if status == "failed" {
 			log.Debugf("host %s is failed, next.\n", host)
 		} else {
-
 			for _, stage := range stages {
-				// 判断stage是否允许执行
 				if roles.IsRolesAllow(stage.(string), rolesData) {
 					// 3. TODO: 解析yaml中shell的模块，然后进行匹配
-					err := roles.NewShellRole(roles.NewRoleArgs(stage.(string), remote_user, host, vars, configs, msgs, nil, s.terminial))
+					err := roles.NewShellRole(roles.NewRoleArgs(stage.(string), remote_user, remote_pwd, host, vars, configs, msgs, nil, remote_port))
 					if err != nil {
 						log.Debugln(err.Error())
 						os.Exit(1)
 					}
 				}
 			}
+
+			// execChan := make(chan string, runtime.NumCPU())
+			// var w sync.WaitGroup
+			// for _, stage := range stages {
+			// w.Add(1)
+			// execChan <- stage.(string)
+			// go func() {
+			// 	defer w.Done()
+			// 	// 判断stage是否允许执行
+			// 	if roles.IsRolesAllow(stage.(string), rolesData) {
+			// 		// 3. TODO: 解析yaml中shell的模块，然后进行匹配
+			// 		err := roles.NewShellRole(roles.NewRoleArgs(stage.(string), remote_user, host, vars, configs, msgs, nil))
+			// 		if err != nil {
+			// 			log.Debugln(err.Error())
+			// 			os.Exit(1)
+			// 		}
+			// 	}
+			// 	<-execChan
+			// }()
+			// }
+			// w.Wait()
 		}
 	}
 
@@ -130,9 +161,4 @@ func (s *ShellFilter) Process(msgs *Message) *Message {
 func (s *ShellFilter) Init(data interface{}) {
 	s.name = "Shell Filter"
 	s.status = Started
-	if data != nil {
-		if isterminial, ok := data.(map[string]interface{})["terminial"]; ok {
-			s.terminial = isterminial.(bool)
-		}
-	}
 }

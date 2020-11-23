@@ -73,11 +73,12 @@ COMMITINFO: <font color="comment">{{.info}}</font>
 		data := map[string]interface{}{
 			"host":        args,
 			"remote_user": cliUser,
+			"remote_pwd":  cliPwd,
+			"remote_port": cliPort,
 			"roles":       []interface{}{"template"},
 			"stage":       []interface{}{"template"},
-			"terminial":   false,
 			"vars":        viper.GetStringMap("vars"),
-			"hooks":       []interface{}{map[interface{}]interface{}{"type": "none"}},
+			"hooks":       []interface{}{map[interface{}]interface{}{"type": cliLogout}},
 			"config": []interface{}{map[interface{}]interface{}{
 				"stage": "template",
 				"name":  "模板文件上传",
@@ -114,7 +115,6 @@ func init() {
 	// is called directly, e.g.:
 	// templateCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 
-	templateCmd.Flags().StringVarP(&cliUser, "user", "u", "root", "远程主机执行用户，默认：root")
 	templateCmd.Flags().StringVarP(&cliSrc, "src", "S", "", "本机模板文件")
 	templateCmd.Flags().StringVarP(&cliDest, "dest", "D", "", "目标机上传路径")
 }

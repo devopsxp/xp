@@ -53,7 +53,7 @@ func (c *CopyRole) Init(args *RoleArgs) error {
 func (c *CopyRole) Run() error {
 	var err error
 	if c.items == nil {
-		err := utils.New(c.host, c.remote_user, "", 22).SftpUploadToRemote(c.src, c.dest)
+		err := utils.New(c.host, c.remote_user, c.remote_pwd, c.remote_port).SftpUploadToRemote(c.src, c.dest)
 		if err != nil {
 			log.WithFields(log.Fields{
 				"src":  c.src,
@@ -83,7 +83,7 @@ func (c *CopyRole) Run() error {
 				panic(err)
 			}
 			dest, err := utils.ApplyTemplate(c.dest, map[string]interface{}{"item": it})
-			err = utils.New(c.host, c.remote_user, "", 22).SftpUploadToRemote(src, dest)
+			err = utils.New(c.host, c.remote_user, c.remote_pwd, c.remote_port).SftpUploadToRemote(src, dest)
 			if err != nil {
 				log.WithFields(log.Fields{
 					"src":  src,
