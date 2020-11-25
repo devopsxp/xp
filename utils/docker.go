@@ -1,5 +1,6 @@
 // http://dockone.io/article/109
 // https://docs.docker.com/engine/api/v1.24/#2-errors
+// https://godoc.org/github.com/docker/docker/client#FromEnv
 package utils
 
 import (
