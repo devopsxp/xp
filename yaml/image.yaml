@@ -5,11 +5,11 @@
     - -v /tmp:/data
     - -v /opt:/opt
   command:
-    - java -version
-    - date
-    - pwd
-    - hostname
-    - cat /proc/version
+    - java -version && 
+    - date && 
+    - pwd && 
+    - hostname && 
+    - cat /proc/version &&
     - for i in {1..10};do echo `date`;sleep 1;done
   # container:
   #   Hostname: "hn"

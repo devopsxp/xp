@@ -3,8 +3,6 @@ package utils
 import (
 	"fmt"
 	"os/exec"
-
-	log "github.com/sirupsen/logrus"
 )
 
 type dockerCli struct {
@@ -63,8 +61,6 @@ func (d *dockerCli) Run() error {
 	}
 
 	d.AddArgs()
-
-	log.Warnln(fmt.Sprintf("%s %s %s", d.command, d.image, d.cmd))
 
 	err := ExecCommandStd(fmt.Sprintf("%s %s %s", d.command, d.image, d.cmd))
 	if err != nil {

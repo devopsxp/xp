@@ -14,6 +14,7 @@ require (
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/pkg/sftp v1.12.0
+	github.com/prometheus/common v0.4.0
 	github.com/rogpeppe/godef v1.1.2 // indirect
 	github.com/sirupsen/logrus v1.6.0
 	github.com/spf13/cobra v1.0.0

@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/devopsxp/xp/utils"
+	log "github.com/sirupsen/logrus"
 )
 
 func init() {
@@ -178,8 +179,11 @@ func (r *DockerRole) Run() error {
 	// }).Info(string(rs))
 	// r.logs[fmt.Sprintf("%s %s %s", r.stage, r.host, r.name)] = string(rs)
 
-	cli := utils.NewDockerCli(r.args, r.image, strings.Join(r.command, " && "))
+	cli := utils.NewDockerCli(r.args, r.image, strings.Join(r.command, " "))
 	err := cli.Run()
+	log.WithFields(log.Fields{
+		"耗时": time.Now().Sub(r.starttime),
+	}).Infof("[Local Docker] docker run -it --rm %s %s", r.image, strings.Join(r.command, " "))
 
 	return err
 }
