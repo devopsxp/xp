@@ -66,11 +66,11 @@ func (d *dockerCli) Run() error {
 
 	log.Warnln(fmt.Sprintf("%s %s %s", d.command, d.image, d.cmd))
 
-	rs, err := ExecCommandString(fmt.Sprintf("%s %s %s", d.command, d.image, d.cmd))
+	err := ExecCommandStd(fmt.Sprintf("%s %s %s", d.command, d.image, d.cmd))
 	if err != nil {
 		return err
 	}
 
-	log.Info(rs)
+	// log.Info(rs)
 	return nil
 }

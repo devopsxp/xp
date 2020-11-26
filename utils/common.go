@@ -75,6 +75,19 @@ func GetRandomString(len int) string {
 	return string(result)
 }
 
+func ExecCommandStd(cmd string) error {
+	pipeline := exec.Command("/bin/sh", "-c", cmd)
+	pipeline.Stdin = os.Stdin
+	pipeline.Stdout = os.Stdout
+	pipeline.Stderr = os.Stderr
+	err := pipeline.Run()
+	if err != nil {
+		return err
+	}
+	// fmt.Println(stderr.String())
+	return nil
+}
+
 func ExecCommand(cmd string) ([]byte, error) {
 	pipeline := exec.Command("/bin/sh", "-c", cmd)
 	var out bytes.Buffer
