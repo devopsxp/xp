@@ -3,10 +3,10 @@ package roles
 import (
 	"fmt"
 	"reflect"
+	"strings"
 	"time"
 
 	"github.com/devopsxp/xp/utils"
-	log "github.com/sirupsen/logrus"
 )
 
 func init() {
@@ -47,6 +47,7 @@ Build:
 type DockerRole struct {
 	RoleLC
 	command []string // 执行脚本命令
+	args    []string // 执行参数 -v -e
 	image   string   // 执行镜像
 }
 
@@ -73,105 +74,114 @@ func (r *DockerRole) Init(args *RoleArgs) error {
 		}
 	}
 
+	if args, ok := args.currentConfig["args"]; ok {
+		for _, arg := range args.([]interface{}) {
+			r.args = append(r.args, arg.(string))
+		}
+	}
+
 	return nil
 }
 
 func (r *DockerRole) Run() error {
 	// Docker RemoteAPI Dedefault Port
-	port := "9999"
-	env := []string{}
+	// port := "9999"
+	// env := []string{}
 
-	for k, v := range r.vars {
-		if reflect.TypeOf(v).String() == "string" {
-			env = append(env, fmt.Sprintf("%s=%s", k, v.(string)))
-		}
-	}
+	// for k, v := range r.vars {
+	// 	if reflect.TypeOf(v).String() == "string" {
+	// 		env = append(env, fmt.Sprintf("%s=%s", k, v.(string)))
+	// 	}
+	// }
 
-	data := map[string]interface{}{
-		"Hostname":     "",
-		"Domainname":   "",
-		"User":         "",
-		"AttachStdin":  false,
-		"AttachStdout": true,
-		"AttachStderr": true,
-		"Tty":          false,
-		"OpenStdin":    false,
-		"StdinOnce":    false,
-		"Env":          env,
-		"Cmd":          r.command,
-		"Entrypoint":   "",
-		"Image":        r.image,
-		"Volumes": map[string]interface{}{
-			"/tmp": map[string]string{},
-		},
-		"WorkingDir":      "/",
-		"NetworkDisabled": false,
-		"ExposedPorts": map[string]interface{}{
-			"22/tcp": map[string]string{},
-		},
-		"StopSignal": "SIGTERM",
-		"HostConfig": map[string]interface{}{
-			"Binds":              []string{"/tmp:/tmp"},
-			"Tmpfs":              map[string]string{"/run": "rw,noexec,nosuid,size=65536k"},
-			"Links":              []string{}, // "redis3:redis"
-			"Memory":             0,          // 8MB
-			"MemorySwap":         0,
-			"MemoryReservation":  0,
-			"KernelMemory":       0,
-			"CpuShares":          512,
-			"CpuPeriod":          100000,
-			"CpuQuota":           50000,
-			"CpusetCpus":         "",
-			"CpusetMems":         "",
-			"IOMaximumBandwidth": 0,
-			"IOMaximumIOps":      0,
-			"MemorySwappiness":   60,
-			"OomKillDisable":     false,
-			"OomScoreAdj":        500,
-			"PidMode":            "",
-			"PidsLimit":          -1,
-			"PortBindings":       map[string]interface{}{"22/tcp": []map[string]string{map[string]string{"HostPort": "11022"}}},
-			"PublishAllPorts":    false,
-			"Privileged":         false,
-			"ReadonlyRootfs":     false,
-			"Dns":                []string{"8.8.8.8"},
-			"DnsOptions":         []string{},
-			"DnsSearch":          []string{},
-			"ExtraHosts":         []string{},
-			"VolumesFrom":        []string{}, // ["parent", "other:ro"],
-			"CapAdd":             []string{"NET_ADMIN"},
-			"CapDrop":            []string{"MKNOD"},
-			"RestartPolicy":      map[string]interface{}{"Name": "", "MaximumRetryCount": 0},
-			"NetworkMode":        "bridge",
-			"Devices":            []string{},
-			"Sysctls":            map[string]string{"net.ipv4.ip_forward": "1"},
-			"Ulimits":            []map[string]string{},
-			"LogConfig":          map[string]interface{}{"Type": "json-file", "Config": map[string]string{}},
-			"SecurityOpt":        []string{},
-			"CgroupParent":       "",
-			"VolumeDriver":       "",
-			"ShmSize":            67108864,
-		},
-	}
+	// data := map[string]interface{}{
+	// 	"Hostname":     "",
+	// 	"Domainname":   "",
+	// 	"User":         "",
+	// 	"AttachStdin":  false,
+	// 	"AttachStdout": true,
+	// 	"AttachStderr": true,
+	// 	"Tty":          false,
+	// 	"OpenStdin":    false,
+	// 	"StdinOnce":    false,
+	// 	"Env":          env,
+	// 	"Cmd":          r.command,
+	// 	"Entrypoint":   "",
+	// 	"Image":        r.image,
+	// 	"Volumes": map[string]interface{}{
+	// 		"/tmp": map[string]string{},
+	// 	},
+	// 	"WorkingDir":      "/",
+	// 	"NetworkDisabled": false,
+	// 	"ExposedPorts": map[string]interface{}{
+	// 		"22/tcp": map[string]string{},
+	// 	},
+	// 	"StopSignal": "SIGTERM",
+	// 	"HostConfig": map[string]interface{}{
+	// 		"Binds":              []string{"/tmp:/tmp"},
+	// 		"Tmpfs":              map[string]string{"/run": "rw,noexec,nosuid,size=65536k"},
+	// 		"Links":              []string{}, // "redis3:redis"
+	// 		"Memory":             0,          // 8MB
+	// 		"MemorySwap":         0,
+	// 		"MemoryReservation":  0,
+	// 		"KernelMemory":       0,
+	// 		"CpuShares":          512,
+	// 		"CpuPeriod":          100000,
+	// 		"CpuQuota":           50000,
+	// 		"CpusetCpus":         "",
+	// 		"CpusetMems":         "",
+	// 		"IOMaximumBandwidth": 0,
+	// 		"IOMaximumIOps":      0,
+	// 		"MemorySwappiness":   60,
+	// 		"OomKillDisable":     false,
+	// 		"OomScoreAdj":        500,
+	// 		"PidMode":            "",
+	// 		"PidsLimit":          -1,
+	// 		"PortBindings":       map[string]interface{}{"22/tcp": []map[string]string{map[string]string{"HostPort": "11022"}}},
+	// 		"PublishAllPorts":    false,
+	// 		"Privileged":         false,
+	// 		"ReadonlyRootfs":     false,
+	// 		"Dns":                []string{"8.8.8.8"},
+	// 		"DnsOptions":         []string{},
+	// 		"DnsSearch":          []string{},
+	// 		"ExtraHosts":         []string{},
+	// 		"VolumesFrom":        []string{}, // ["parent", "other:ro"],
+	// 		"CapAdd":             []string{"NET_ADMIN"},
+	// 		"CapDrop":            []string{"MKNOD"},
+	// 		"RestartPolicy":      map[string]interface{}{"Name": "", "MaximumRetryCount": 0},
+	// 		"NetworkMode":        "bridge",
+	// 		"Devices":            []string{},
+	// 		"Sysctls":            map[string]string{"net.ipv4.ip_forward": "1"},
+	// 		"Ulimits":            []map[string]string{},
+	// 		"LogConfig":          map[string]interface{}{"Type": "json-file", "Config": map[string]string{}},
+	// 		"SecurityOpt":        []string{},
+	// 		"CgroupParent":       "",
+	// 		"VolumeDriver":       "",
+	// 		"ShmSize":            67108864,
+	// 	},
+	// }
 
-	cli := utils.NewDockerCLI(r.host, port, "")
-	rs, err := cli.CreateContainer(data)
-	if err != nil {
-		log.WithFields(log.Fields{
-			"command": len(r.command),
-			"耗时":      time.Now().Sub(r.starttime),
-		}).Errorln(err.Error())
-		r.logs[fmt.Sprintf("%s %s %s", r.stage, r.host, r.name)] = err.Error()
-		return err
-	}
+	// cli := utils.NewDockerCLI(r.host, port, "")
+	// rs, err := cli.CreateContainer(data)
+	// if err != nil {
+	// 	log.WithFields(log.Fields{
+	// 		"command": len(r.command),
+	// 		"耗时":      time.Now().Sub(r.starttime),
+	// 	}).Errorln(err.Error())
+	// 	r.logs[fmt.Sprintf("%s %s %s", r.stage, r.host, r.name)] = err.Error()
+	// 	return err
+	// }
 
-	log.WithFields(log.Fields{
-		"command": len(r.command),
-		"耗时":      time.Now().Sub(r.starttime),
-	}).Info(string(rs))
-	r.logs[fmt.Sprintf("%s %s %s", r.stage, r.host, r.name)] = string(rs)
+	// log.WithFields(log.Fields{
+	// 	"command": len(r.command),
+	// 	"耗时":      time.Now().Sub(r.starttime),
+	// }).Info(string(rs))
+	// r.logs[fmt.Sprintf("%s %s %s", r.stage, r.host, r.name)] = string(rs)
 
-	return nil
+	cli := utils.NewDockerCli(r.args, r.image, strings.Join(r.command, " && "))
+	err := cli.Run()
+
+	return err
 }
 
 // 处理返回日志

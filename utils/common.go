@@ -79,6 +79,7 @@ func ExecCommand(cmd string) ([]byte, error) {
 	pipeline := exec.Command("/bin/sh", "-c", cmd)
 	var out bytes.Buffer
 	var stderr bytes.Buffer
+	pipeline.Stdin = os.Stdin
 	pipeline.Stdout = &out
 	pipeline.Stderr = &stderr
 	err := pipeline.Run()
@@ -93,6 +94,7 @@ func ExecCommandString(cmd string) (string, error) {
 	pipeline := exec.Command("/bin/sh", "-c", cmd)
 	var out bytes.Buffer
 	var stderr bytes.Buffer
+	pipeline.Stdin = os.Stdin
 	pipeline.Stdout = &out
 	pipeline.Stderr = &stderr
 	err := pipeline.Run()
