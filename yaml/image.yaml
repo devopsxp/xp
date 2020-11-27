@@ -1,4 +1,4 @@
-- stage: test
+- stage: image
   name: docker image执行测试
   image: golang:1.15
   args:
