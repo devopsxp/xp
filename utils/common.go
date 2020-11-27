@@ -293,3 +293,21 @@ func IsBetweenAB(start, end string) (bool, error) {
 	log.Println("验证时间", rs, fmt.Sprintf("%s %s", days, start), fmt.Sprintf("%s %s", days, end), now.Format(format_mm))
 	return rs, nil
 }
+
+//PathExists 判断文件夹是否存在
+func PathExists(path string) (bool, error) {
+	_, err := os.Stat(path)
+	if err == nil {
+		return true, nil
+	}
+	if os.IsNotExist(err) {
+		// 创建文件夹
+		err := os.MkdirAll(path, os.ModePerm)
+		if err != nil {
+			return false, err
+		} else {
+			return true, nil
+		}
+	}
+	return false, err
+}

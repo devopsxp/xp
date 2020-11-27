@@ -1,6 +1,7 @@
 package module
 
 import (
+	"fmt"
 	"os"
 	"reflect"
 	"runtime"
@@ -8,6 +9,7 @@ import (
 	. "github.com/devopsxp/xp/plugin"
 	"github.com/devopsxp/xp/roles"
 	"github.com/devopsxp/xp/utils"
+	uuid "github.com/satori/go.uuid"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -82,9 +84,71 @@ func (s *ShellFilter) Process(msgs *Message) *Message {
 
 	log.Debugf("Config %v\n", configs)
 	var (
-		remote_user, remote_pwd string
-		remote_port             int
+		pipelineUuid                     string
+		remote_user, remote_pwd, workdir string
+		remote_port                      int
 	)
+
+	pipelineUuid = uuid.NewV4().String()
+
+	// docker共享空间
+	if path, ok := msgs.Data.Items["workdir"]; ok {
+		workdir = path.(string)
+		isexist, err := utils.PathExists(workdir)
+		if !isexist && err != nil {
+			panic(err)
+		}
+		log.Debugf("判断docker共享目录是否存在: %s", workdir)
+	} else {
+		// 当没有设置workdir时，判断并创建在当前目录下
+		workdir = fmt.Sprintf("%s/workspace", utils.GetCurrentDirectory())
+		isexist, err := utils.PathExists(workdir)
+		if !isexist && err != nil {
+			panic(err)
+		}
+		log.Debugf("判断docker共享目录是否存在: %s", workdir)
+	}
+
+	log.Warnf("准备docker 共享目录完毕: %s", workdir)
+
+	// 如果设置了git仓库，则拉取repo并修改workdir路径
+	if git, ok := msgs.Data.Items["git"]; ok {
+		var branch, depth, cmd string
+		// 如果设置了url则进行往下进行
+		if url, ok := git.(map[string]interface{})["url"]; ok {
+			if br, ok := git.(map[string]interface{})["branch"]; ok {
+				branch = br.(string)
+			}
+
+			if dep, ok := git.(map[string]interface{})["depth"]; ok {
+				depth = fmt.Sprintf("%d", dep.(int))
+			}
+
+			if branch != "" && depth != "" {
+				cmd = fmt.Sprintf("git clone %s -b %s --depth %s %s/%s", url, branch, depth, workdir, pipelineUuid)
+			} else if branch == "" && depth != "" {
+				cmd = fmt.Sprintf("git clone %s --depth %s %s/%s", url, depth, workdir, pipelineUuid)
+			} else if branch != "" && depth == "" {
+				cmd = fmt.Sprintf("git clone %s -b %s %s/%s", url, branch, workdir, pipelineUuid)
+			} else {
+				cmd = fmt.Sprintf("git clone %s %s/%s", url, workdir, pipelineUuid)
+			}
+
+			rs, err := utils.ExecCommandString(cmd)
+			if err != nil {
+				log.WithFields(log.Fields{
+					"cmd": cmd,
+				}).Error(rs)
+			}
+
+			log.WithFields(log.Fields{
+				"cmd": cmd,
+			}).Infof("success git clone: %s", rs)
+
+			workdir = fmt.Sprintf("%s/%s", workdir, pipelineUuid)
+			log.Warnf("准备docker git clone共享目录完毕: %s", workdir)
+		}
+	}
 
 	if user, ok := msgs.Data.Items["remote_user"]; ok {
 		remote_user = user.(string)
@@ -124,7 +188,7 @@ func (s *ShellFilter) Process(msgs *Message) *Message {
 			for _, stage := range stages {
 				if roles.IsRolesAllow(stage.(string), rolesData) {
 					// 3. TODO: 解析yaml中shell的模块，然后进行匹配
-					err := roles.NewShellRole(roles.NewRoleArgs(stage.(string), remote_user, remote_pwd, host, vars, configs, msgs, nil, remote_port))
+					err := roles.NewShellRole(roles.NewRoleArgs(stage.(string), remote_user, remote_pwd, host, workdir, vars, configs, msgs, nil, remote_port))
 					if err != nil {
 						log.Debugln(err.Error())
 						os.Exit(1)

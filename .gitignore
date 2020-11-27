@@ -17,3 +17,4 @@ xp
 *.log
 *.backup.yaml
 d.yaml
+workspace/

@@ -16,6 +16,7 @@ require (
 	github.com/pkg/sftp v1.12.0
 	github.com/prometheus/common v0.4.0
 	github.com/rogpeppe/godef v1.1.2 // indirect
+	github.com/satori/go.uuid v1.2.0
 	github.com/sirupsen/logrus v1.6.0
 	github.com/spf13/cobra v1.0.0
 	github.com/spf13/viper v1.7.1

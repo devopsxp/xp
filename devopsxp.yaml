@@ -9,6 +9,11 @@ roles: # 执行具体stage
   - vim-go
   - build
   - test
+# workdir: /tmp/workspace # docker镜像共享目录 默认: ./workspace
+git:
+  url: https://gitee.com/lflxp/showme.git
+  branch: master
+  depth: 1
 vars: # 环境变量 默认会将所有Key转换未小写字母，请写模板的时候注意
   Status: true
   title: "模板测试"
@@ -96,7 +101,7 @@ hooks: # 消息发送 全局一个 可以一次发送所有结果到多个渠道
 #         serviceName: "xp"
   # - type: phone
   # - type: sms
-stage: # 流程步骤
+stage: # 注册的可执行流程步骤
   - user
   - vim-go
   - build
