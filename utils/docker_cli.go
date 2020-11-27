@@ -3,20 +3,26 @@ package utils
 import (
 	"fmt"
 	"os/exec"
+
+	log "github.com/sirupsen/logrus"
 )
 
 type dockerCli struct {
-	image   string
-	args    []string // 启动参数
-	command string   // 最终执行命令
-	cmd     string   // docker命令
+	image     string
+	args      []string // 启动参数
+	command   string   // 最终执行命令
+	cmd       string   // docker命令
+	workspace string   // 工作空间
+	reponame  string   // 项目名
 }
 
-func NewDockerCli(args []string, image, cmd string) *dockerCli {
+func NewDockerCli(args []string, image, cmd, workspace, reponame string) *dockerCli {
 	return &dockerCli{
-		args:  args,
-		image: image,
-		cmd:   cmd,
+		args:      args,
+		image:     image,
+		cmd:       cmd,
+		workspace: workspace,
+		reponame:  reponame,
 	}
 }
 
@@ -25,7 +31,8 @@ func (d *dockerCli) CheckPath() error {
 	if path, err := exec.LookPath("docker"); err != nil {
 		return err
 	} else {
-		d.command = fmt.Sprintf("%s run -it --rm ", path)
+		fmt.Println(d.workspace, d.reponame)
+		d.command = fmt.Sprintf("%s run -it --rm -v %s:/tmp/%s -w /tmp/%s ", path, d.workspace, d.reponame, d.reponame)
 	}
 
 	return nil
@@ -62,7 +69,8 @@ func (d *dockerCli) Run() error {
 
 	d.AddArgs()
 
-	err := ExecCommandStd(fmt.Sprintf("%s %s %s", d.command, d.image, d.cmd))
+	log.Debugf(fmt.Sprintf("%s %s sh -c '%s'", d.command, d.image, d.cmd))
+	err := ExecCommandStd(fmt.Sprintf("%s %s sh -c '%s'", d.command, d.image, d.cmd))
 	if err != nil {
 		return err
 	}

@@ -70,13 +70,13 @@ func ParseRoleType(config map[interface{}]interface{}) (rt RoleType, isok bool) 
 // @Params hook 自定义config执行完的钩子函数
 // @Params isTerminial 是否terminial执行shell
 type RoleArgs struct {
-	stage, user, pwd, host, workdir string
-	port                            int
-	vars                            map[string]interface{}
-	configs                         []interface{}
-	currentConfig                   map[interface{}]interface{}
-	msg                             *Message
-	hook                            *Hook
+	stage, user, pwd, host, workdir, reponame string
+	port                                      int
+	vars                                      map[string]interface{}
+	configs                                   []interface{}
+	currentConfig                             map[interface{}]interface{}
+	msg                                       *Message
+	hook                                      *Hook
 }
 
 func (r *RoleArgs) AddCountByName(ip, item string) error {
@@ -103,18 +103,19 @@ func (r *RoleArgs) AddCountByName(ip, item string) error {
 	return nil
 }
 
-func NewRoleArgs(stage, user, pwd, host, workdir string, vars map[string]interface{}, configs []interface{}, msg *Message, hook *Hook, port int) *RoleArgs {
+func NewRoleArgs(stage, user, pwd, host, workdir, reponame string, vars map[string]interface{}, configs []interface{}, msg *Message, hook *Hook, port int) *RoleArgs {
 	return &RoleArgs{
-		stage:   stage,
-		user:    user,
-		pwd:     pwd,
-		port:    port,
-		host:    host,
-		vars:    vars,
-		configs: configs,
-		msg:     msg,
-		hook:    hook,
-		workdir: workdir,
+		stage:    stage,
+		user:     user,
+		pwd:      pwd,
+		port:     port,
+		host:     host,
+		vars:     vars,
+		configs:  configs,
+		msg:      msg,
+		hook:     hook,
+		workdir:  workdir,
+		reponame: reponame,
 	}
 }
 

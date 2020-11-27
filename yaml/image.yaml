@@ -1,16 +1,17 @@
 - stage: test
   name: docker image执行测试
-  image: java:8
+  image: golang:1.15
   args:
-    - -v /tmp:/data
-    - -v /opt:/opt
+    - -v ${PWD}:/998
+    - -e GO111MODULE=on
+    - -e GOPROXY=https://goproxy.cn
   command:
-    - java -version && 
-    - date && 
-    - pwd && 
-    - hostname && 
-    - cat /proc/version &&
-    - for i in {1..10};do echo `date`;sleep 1;done
+    - go version
+    - pwd 
+    - ls -l 
+    - go build
+    - ls -l
+    - for i in {1..10};do echo `date`;sleep 0.5;done
   # container:
   #   Hostname: "hn"
   #   User: "root"

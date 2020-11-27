@@ -5,6 +5,7 @@ import (
 	"os"
 	"reflect"
 	"runtime"
+	"strings"
 
 	. "github.com/devopsxp/xp/plugin"
 	"github.com/devopsxp/xp/roles"
@@ -84,11 +85,12 @@ func (s *ShellFilter) Process(msgs *Message) *Message {
 
 	log.Debugf("Config %v\n", configs)
 	var (
-		pipelineUuid                     string
-		remote_user, remote_pwd, workdir string
-		remote_port                      int
+		pipelineUuid                               string
+		remote_user, remote_pwd, workdir, reponame string
+		remote_port                                int
 	)
 
+	log.Info("******************************************************** Prepare [DockerWorkspace : 镜像工作空间设置] ")
 	pipelineUuid = uuid.NewV4().String()
 
 	// docker共享空间
@@ -109,13 +111,17 @@ func (s *ShellFilter) Process(msgs *Message) *Message {
 		log.Debugf("判断docker共享目录是否存在: %s", workdir)
 	}
 
-	log.Warnf("准备docker 共享目录完毕: %s", workdir)
+	log.Infof("准备docker 共享目录完毕: %s", workdir)
 
 	// 如果设置了git仓库，则拉取repo并修改workdir路径
 	if git, ok := msgs.Data.Items["git"]; ok {
+
 		var branch, depth, cmd string
 		// 如果设置了url则进行往下进行
 		if url, ok := git.(map[string]interface{})["url"]; ok {
+			log.Infof("******************************************************** Prepare [GitClone : %s] ", url)
+
+			reponame = strings.Split(url.(string), "/")[len(strings.Split(url.(string), "/"))-1]
 			if br, ok := git.(map[string]interface{})["branch"]; ok {
 				branch = br.(string)
 			}
@@ -146,7 +152,7 @@ func (s *ShellFilter) Process(msgs *Message) *Message {
 			}).Infof("success git clone: %s", rs)
 
 			workdir = fmt.Sprintf("%s/%s", workdir, pipelineUuid)
-			log.Warnf("准备docker git clone共享目录完毕: %s", workdir)
+			log.Infof("准备docker git clone共享目录完毕: %s", workdir)
 		}
 	}
 
@@ -188,7 +194,7 @@ func (s *ShellFilter) Process(msgs *Message) *Message {
 			for _, stage := range stages {
 				if roles.IsRolesAllow(stage.(string), rolesData) {
 					// 3. TODO: 解析yaml中shell的模块，然后进行匹配
-					err := roles.NewShellRole(roles.NewRoleArgs(stage.(string), remote_user, remote_pwd, host, workdir, vars, configs, msgs, nil, remote_port))
+					err := roles.NewShellRole(roles.NewRoleArgs(stage.(string), remote_user, remote_pwd, host, workdir, reponame, vars, configs, msgs, nil, remote_port))
 					if err != nil {
 						log.Debugln(err.Error())
 						os.Exit(1)

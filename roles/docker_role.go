@@ -47,9 +47,11 @@ Build:
 
 type DockerRole struct {
 	RoleLC
-	command []string // 执行脚本命令
-	args    []string // 执行参数 -v -e
-	image   string   // 执行镜像
+	command   []string // 执行脚本命令
+	args      []string // 执行参数 -v -e
+	image     string   // 执行镜像
+	workspace string   // 工作空间
+	reponame  string   // git代码项目名
 }
 
 // 准备数据
@@ -64,6 +66,10 @@ func (r *DockerRole) Init(args *RoleArgs) error {
 	if err != nil {
 		return err
 	}
+
+	// 设置工作空间
+	r.workspace = args.workdir
+	r.reponame = args.reponame
 
 	// 获取镜像
 	r.image = args.currentConfig["image"].(string)
@@ -179,11 +185,11 @@ func (r *DockerRole) Run() error {
 	// }).Info(string(rs))
 	// r.logs[fmt.Sprintf("%s %s %s", r.stage, r.host, r.name)] = string(rs)
 
-	cli := utils.NewDockerCli(r.args, r.image, strings.Join(r.command, " "))
+	cli := utils.NewDockerCli(r.args, r.image, strings.Join(r.command, " && "), r.workspace, r.reponame)
 	err := cli.Run()
 	log.WithFields(log.Fields{
 		"耗时": time.Now().Sub(r.starttime),
-	}).Infof("[Local Docker] docker run -it --rm %s %s", r.image, strings.Join(r.command, " "))
+	}).Infof("[Local Docker] docker run -it --rm -v %s:/tmp/%s -w /tmp/%s %s sh -c '%s'", r.workspace, r.reponame, r.reponame, r.image, strings.Join(r.command, " && "))
 
 	return err
 }
