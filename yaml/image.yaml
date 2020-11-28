@@ -3,6 +3,7 @@
   image: golang:1.14-alpine
   args:
     - -v ${PWD}:/998
+    - -v /opt/gopath/pkg/mod:/go/pkg/mod
     - -e GO111MODULE=on
     - -e GOPROXY=https://goproxy.cn
   command:
