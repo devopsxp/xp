@@ -3,8 +3,6 @@ package utils
 import (
 	"fmt"
 	"os/exec"
-
-	log "github.com/sirupsen/logrus"
 )
 
 type dockerCli struct {
@@ -46,7 +44,7 @@ func (d *dockerCli) AddArgs() *dockerCli {
 
 	if d.command != "" {
 		for _, arg := range d.args {
-			d.command += arg + " "
+			d.command = fmt.Sprintf("%s %s ", d.command, arg)
 		}
 	}
 	return d
@@ -62,19 +60,20 @@ func (d *dockerCli) AddArg(arg string) *dockerCli {
 	return d
 }
 
-func (d *dockerCli) Run() error {
+func (d *dockerCli) Run() (string, error) {
 	if err := d.CheckPath(); err != nil {
-		return err
+		return "", err
 	}
 
 	d.AddArgs()
 
-	log.Debugf(fmt.Sprintf("%s %s sh -c '%s'", d.command, d.image, d.cmd))
-	err := ExecCommandStd(fmt.Sprintf("%s %s sh -c '%s'", d.command, d.image, d.cmd))
+	cmd := fmt.Sprintf("%s %s sh -c '%s'", d.command, d.image, d.cmd)
+
+	err := ExecCommandStd(cmd)
 	if err != nil {
-		return err
+		return cmd, err
 	}
 
 	// log.Info(rs)
-	return nil
+	return cmd, nil
 }

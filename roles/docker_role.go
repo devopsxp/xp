@@ -186,10 +186,10 @@ func (r *DockerRole) Run() error {
 	// r.logs[fmt.Sprintf("%s %s %s", r.stage, r.host, r.name)] = string(rs)
 
 	cli := utils.NewDockerCli(r.args, r.image, strings.Join(r.command, " && "), r.workspace, r.reponame)
-	err := cli.Run()
+	cmd, err := cli.Run()
 	log.WithFields(log.Fields{
 		"耗时": time.Now().Sub(r.starttime),
-	}).Infof("[Local Docker] docker run -it --rm -v %s:/tmp/%s -w /tmp/%s %s sh -c '%s'", r.workspace, r.reponame, r.reponame, r.image, strings.Join(r.command, " && "))
+	}).Infof("[Local Docker] %s", cmd)
 
 	return err
 }

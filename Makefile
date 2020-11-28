@@ -1,4 +1,4 @@
-playbook:
+playbook: clean
 	go build && ./xp playbook --config  devopsxp.yaml
 
 debug:
