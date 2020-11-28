@@ -43,8 +43,18 @@
   command:
     - ls -l
     - docker ps
-    - docker rm gin
+    - docker stop gin && docker rm gin
     - docker run -d --name gin -p 8080:8080 gintest
     - docker ps
+
   tags:
     - 127.0.0.1
+
+- stage: image
+  name: 性能测试
+  shell: "{{.item}}"
+  with_items:
+  - pwd
+  - ls -l
+  - k6 run test.js
+  terminial: true
