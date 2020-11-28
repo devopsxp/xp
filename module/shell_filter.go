@@ -88,7 +88,25 @@ func (s *ShellFilter) Process(msgs *Message) *Message {
 		pipelineUuid                               string
 		remote_user, remote_pwd, workdir, reponame string
 		remote_port                                int
+		timeout                                    int
+		timeoutexit                                bool
 	)
+
+	// 设置超时时间
+	if to, ok := msgs.Data.Items["timeout"]; ok {
+		timeout = to.(int)
+	} else {
+		// 默认root用户
+		timeout = 60
+	}
+
+	// 设置超时是否退出
+	if toe, ok := msgs.Data.Items["timeoutexit"]; ok {
+		timeoutexit = toe.(bool)
+	} else {
+		// 默认root用户
+		timeoutexit = true
+	}
 
 	log.Info("******************************************************** Prepare [DockerWorkspace : 镜像工作空间设置] ")
 	pipelineUuid = uuid.NewV4().String()
@@ -194,7 +212,7 @@ func (s *ShellFilter) Process(msgs *Message) *Message {
 			for _, stage := range stages {
 				if roles.IsRolesAllow(stage.(string), rolesData) {
 					// 3. TODO: 解析yaml中shell的模块，然后进行匹配
-					err := roles.NewShellRole(roles.NewRoleArgs(stage.(string), remote_user, remote_pwd, host, workdir, reponame, vars, configs, msgs, nil, remote_port))
+					err := roles.NewShellRole(roles.NewRoleArgs(stage.(string), remote_user, remote_pwd, host, workdir, reponame, vars, configs, msgs, nil, remote_port, timeout, timeoutexit))
 					if err != nil {
 						log.Debugln(err.Error())
 						os.Exit(1)

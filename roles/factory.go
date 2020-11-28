@@ -3,6 +3,7 @@ package roles
 import (
 	"errors"
 	"fmt"
+	"os"
 	"reflect"
 	"strings"
 	"time"
@@ -71,12 +72,13 @@ func ParseRoleType(config map[interface{}]interface{}) (rt RoleType, isok bool) 
 // @Params isTerminial 是否terminial执行shell
 type RoleArgs struct {
 	stage, user, pwd, host, workdir, reponame string
-	port                                      int
+	port, timeout                             int
 	vars                                      map[string]interface{}
 	configs                                   []interface{}
 	currentConfig                             map[interface{}]interface{}
 	msg                                       *Message
 	hook                                      *Hook
+	timeoutexit                               bool // 超时是否退出
 }
 
 func (r *RoleArgs) AddCountByName(ip, item string) error {
@@ -103,19 +105,21 @@ func (r *RoleArgs) AddCountByName(ip, item string) error {
 	return nil
 }
 
-func NewRoleArgs(stage, user, pwd, host, workdir, reponame string, vars map[string]interface{}, configs []interface{}, msg *Message, hook *Hook, port int) *RoleArgs {
+func NewRoleArgs(stage, user, pwd, host, workdir, reponame string, vars map[string]interface{}, configs []interface{}, msg *Message, hook *Hook, port, timeout int, timeoutexit bool) *RoleArgs {
 	return &RoleArgs{
-		stage:    stage,
-		user:     user,
-		pwd:      pwd,
-		port:     port,
-		host:     host,
-		vars:     vars,
-		configs:  configs,
-		msg:      msg,
-		hook:     hook,
-		workdir:  workdir,
-		reponame: reponame,
+		stage:       stage,
+		user:        user,
+		pwd:         pwd,
+		port:        port,
+		host:        host,
+		vars:        vars,
+		configs:     configs,
+		msg:         msg,
+		hook:        hook,
+		workdir:     workdir,
+		reponame:    reponame,
+		timeout:     timeout,
+		timeoutexit: timeoutexit,
 	}
 }
 
@@ -134,123 +138,147 @@ func NewShellRole(args *RoleArgs) error {
 		}
 	}
 
-	for n, config := range args.configs {
-		// 设置当前config
-		// 静止并行执行
-		args.currentConfig = config.(map[interface{}]interface{})
-		log.Debugf("当前步骤: %d 当前Stage: %s Config信息: %v", n, args.stage, config)
-		rt, ok := ParseRoleType(config.(map[interface{}]interface{}))
-		if !ok {
-			return errors.New(fmt.Sprintf("未匹配到目标Role %v", config))
-		}
+	ch := make(chan error)
 
-		// 排除Include Tags
-		if rt != IncludeType {
-			// 根据RoleType创建对应Role类型
-			role, err := rf.Create(rt)
+	for n, config := range args.configs {
+		go func() {
+			ch <- execConfig(args, n, config)
+		}()
+
+		select {
+		case err := <-ch:
 			if err != nil {
 				return err
 			}
+		case <-time.After(time.Duration(args.timeout) * time.Second):
+			log.Errorf("超时 %d秒： 主机 %s Stage %s %v", args.timeout, args.host, args.stage, config)
+			// 超时是退出还是继续下一步？
+			if args.timeoutexit {
+				log.Error("超时退出")
+				os.Exit(1)
+			}
+		}
+	}
 
-			// 初始化role
-			err = role.Init(args)
-			if err != nil {
-				// 判断是stage不匹配还是其它错误
-				if strings.Contains(err.Error(), "not equal") || strings.Contains(err.Error(), "不在可执行主机范围内") {
-					log.Debugf("%s %v", args.host, err)
-				} else {
-					args.AddCountByName(fmt.Sprintf("%s:%d", args.host, args.port), "failed")
-					return err
-				}
+	return nil
+}
+
+// 执行Config
+func execConfig(args *RoleArgs, n int, config interface{}) error {
+	// 设置当前config
+	// 静止并行执行
+	args.currentConfig = config.(map[interface{}]interface{})
+	log.Debugf("当前步骤: %d 当前Stage: %s Config信息: %v", n, args.stage, config)
+	rt, ok := ParseRoleType(config.(map[interface{}]interface{}))
+	if !ok {
+		return errors.New(fmt.Sprintf("未匹配到目标Role %v", config))
+	}
+
+	// 排除Include Tags
+	if rt != IncludeType {
+		// 根据RoleType创建对应Role类型
+		role, err := rf.Create(rt)
+		if err != nil {
+			return err
+		}
+
+		// 初始化role
+		err = role.Init(args)
+		if err != nil {
+			// 判断是stage不匹配还是其它错误
+			if strings.Contains(err.Error(), "not equal") || strings.Contains(err.Error(), "不在可执行主机范围内") {
+				log.Debugf("%s %v", args.host, err)
 			} else {
-				var skip bool
-				// skip 机制
-				if sk, ok := config.(map[interface{}]interface{})["skip"]; ok {
-					skip = sk.(bool)
-				} else {
-					skip = false
-				}
+				args.AddCountByName(fmt.Sprintf("%s:%d", args.host, args.port), "failed")
+				return err
+			}
+		} else {
+			var skip bool
+			// skip 机制
+			if sk, ok := config.(map[interface{}]interface{})["skip"]; ok {
+				skip = sk.(bool)
+			} else {
+				skip = false
+			}
 
-				if !skip {
-					// 执行Role
-					role.Pre()
-					role.Before()
-					// 处理重试逻辑
-					if retry, ok := config.(map[interface{}]interface{})["retry"]; ok {
-						var errs error
-						for i := 0; i < retry.(int); i++ {
-							errs = role.Run()
-							if errs != nil {
-								log.Warningf("重试第 %d 次，主机: %s Stage: %s User: %s 错误信息： %s", i, args.host, args.stage, args.user, errs.Error())
-								if i+1 == retry {
-									log.Errorf("重试次数 %d 完毕，未能执行完成，错误信息: %s", i, errs.Error())
-								}
-								// 重试等待时间
-								if retryWait, ok := config.(map[interface{}]interface{})["wait"]; ok {
-									log.Warnf("重试等待时间: %d 秒", retryWait.(int))
-									time.Sleep(time.Duration(retryWait.(int)) * time.Second)
-								} else {
-									log.Warnln("重试等待时间: 3 秒")
-									time.Sleep(3 * time.Second)
-								}
-							} else {
-								break
-							}
-						}
-
+			if !skip {
+				// 执行Role
+				role.Pre()
+				role.Before()
+				// 处理重试逻辑
+				if retry, ok := config.(map[interface{}]interface{})["retry"]; ok {
+					var errs error
+					for i := 0; i < retry.(int); i++ {
+						errs = role.Run()
 						if errs != nil {
-							// 判断是否忽略错误
-							if ignore, ok := config.(map[interface{}]interface{})["ignore"]; ok {
-								if ignore.(bool) {
-									args.AddCountByName(fmt.Sprintf("%s:%d", args.host, args.port), "ignored")
-								} else {
-									args.AddCountByName(fmt.Sprintf("%s:%d", args.host, args.port), "failed")
-									return errs
-								}
+							log.Warningf("重试第 %d 次，主机: %s Stage: %s User: %s 错误信息： %s", i, args.host, args.stage, args.user, errs.Error())
+							if i+1 == retry {
+								log.Errorf("重试次数 %d 完毕，未能执行完成，错误信息: %s", i, errs.Error())
+							}
+							// 重试等待时间
+							if retryWait, ok := config.(map[interface{}]interface{})["wait"]; ok {
+								log.Warnf("重试等待时间: %d 秒", retryWait.(int))
+								time.Sleep(time.Duration(retryWait.(int)) * time.Second)
+							} else {
+								log.Warnln("重试等待时间: 3 秒")
+								time.Sleep(3 * time.Second)
+							}
+						} else {
+							break
+						}
+					}
+
+					if errs != nil {
+						// 判断是否忽略错误
+						if ignore, ok := config.(map[interface{}]interface{})["ignore"]; ok {
+							if ignore.(bool) {
+								args.AddCountByName(fmt.Sprintf("%s:%d", args.host, args.port), "ignored")
 							} else {
 								args.AddCountByName(fmt.Sprintf("%s:%d", args.host, args.port), "failed")
 								return errs
 							}
 						} else {
-							args.AddCountByName(fmt.Sprintf("%s:%d", args.host, args.port), "ok")
+							args.AddCountByName(fmt.Sprintf("%s:%d", args.host, args.port), "failed")
+							return errs
 						}
-					} else { // 如果没有设置retry字段
-						err := role.Run()
-						if err != nil {
-							// 判断是否忽略错误
-							if ignore, ok := config.(map[interface{}]interface{})["ignore"]; ok {
-								if ignore.(bool) {
-									args.AddCountByName(fmt.Sprintf("%s:%d", args.host, args.port), "ignored")
-								} else {
-									args.AddCountByName(fmt.Sprintf("%s:%d", args.host, args.port), "failed")
-								}
+					} else {
+						args.AddCountByName(fmt.Sprintf("%s:%d", args.host, args.port), "ok")
+					}
+				} else { // 如果没有设置retry字段
+					err := role.Run()
+					if err != nil {
+						// 判断是否忽略错误
+						if ignore, ok := config.(map[interface{}]interface{})["ignore"]; ok {
+							if ignore.(bool) {
+								args.AddCountByName(fmt.Sprintf("%s:%d", args.host, args.port), "ignored")
 							} else {
 								args.AddCountByName(fmt.Sprintf("%s:%d", args.host, args.port), "failed")
-								return err
 							}
 						} else {
-							args.AddCountByName(fmt.Sprintf("%s:%d", args.host, args.port), "ok")
-						}
-					}
-
-					role.After()
-
-					// Role钩子函数 自定义hook
-					// @Param 实现里RolePlugin接口的实例
-					ishook := role.IsHook()
-					if ishook {
-						err = role.Hooks()
-						if err != nil {
+							args.AddCountByName(fmt.Sprintf("%s:%d", args.host, args.port), "failed")
 							return err
 						}
+					} else {
+						args.AddCountByName(fmt.Sprintf("%s:%d", args.host, args.port), "ok")
 					}
-				} else {
-					log.Infof("****************************** SKIP [ITEM: %s %s %s %v]\n", args.host, args.stage, args.user, config)
-					args.AddCountByName(fmt.Sprintf("%s:%d", args.host, args.port), "skipped")
 				}
+
+				role.After()
+
+				// Role钩子函数 自定义hook
+				// @Param 实现里RolePlugin接口的实例
+				ishook := role.IsHook()
+				if ishook {
+					err = role.Hooks()
+					if err != nil {
+						return err
+					}
+				}
+			} else {
+				log.Infof("****************************** SKIP [ITEM: %s %s %s %v]\n", args.host, args.stage, args.user, config)
+				args.AddCountByName(fmt.Sprintf("%s:%d", args.host, args.port), "skipped")
 			}
 		}
 	}
-
 	return nil
 }

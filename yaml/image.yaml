@@ -17,7 +17,7 @@
   tags:
     - 127.0.0.1
   retry: 3
-  retryWait: 1
+  wait: 1
   skip: false
 
 - stage: image
