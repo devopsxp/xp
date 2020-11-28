@@ -2,8 +2,7 @@
   name: "gin-template build"
   image: golang:1.14-alpine
   args:
-    - -v ${PWD}:/998
-    - -v /opt/gopath/pkg/mod:/go/pkg/mod
+    - -v ${PWD}:/998 # -v /opt/gopath/pkg/mod:/go/pkg/mod
     - -e GO111MODULE=on
     - -e GOPROXY=https://goproxy.cn
   command:
@@ -15,7 +14,6 @@
     - go build
     - ls -l
     - for i in {1..10};do echo `date`;sleep 1;done
-
   tags:
     - 127.0.0.1
   retry: 3
@@ -47,7 +45,6 @@
     - docker stop gin && docker rm gin
     - docker run -d --name gin -p 8080:8080 gintest
     - docker ps
-
   tags:
     - 127.0.0.1
 

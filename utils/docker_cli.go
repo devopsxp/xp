@@ -29,7 +29,6 @@ func (d *dockerCli) CheckPath() error {
 	if path, err := exec.LookPath("docker"); err != nil {
 		return err
 	} else {
-		fmt.Println(d.workspace, d.reponame)
 		d.command = fmt.Sprintf("%s run -it --rm -v %s:/tmp/%s -w /tmp/%s ", path, d.workspace, d.reponame, d.reponame)
 	}
 

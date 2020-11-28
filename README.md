@@ -36,6 +36,8 @@ xp is my name,but this project is look like ansible-playbook and pipeline togeth
                 * k8s
                 * 网络设备
                 * snmp等
+                * 测试
+                  * k6 run test.js
             * 执行
                 * RPC
                 * RESTFULL
