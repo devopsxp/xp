@@ -1,6 +1,7 @@
 package roles
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"os"
@@ -141,6 +142,12 @@ func NewShellRole(args *RoleArgs) error {
 	ch := make(chan error)
 
 	for n, config := range args.configs {
+		// config stage 全局上下文context
+		ctx := context.Background()
+		timeout := time.Duration(args.timeout) * time.Second
+		ctx, cancel := context.WithTimeout(ctx, timeout)
+		defer cancel()
+
 		go func() {
 			ch <- execConfig(args, n, config)
 		}()
@@ -150,7 +157,7 @@ func NewShellRole(args *RoleArgs) error {
 			if err != nil {
 				return err
 			}
-		case <-time.After(time.Duration(args.timeout) * time.Second):
+		case <-ctx.Done():
 			log.Errorf("超时 %d秒： 主机 %s Stage %s %v", args.timeout, args.host, args.stage, config)
 			// 超时是退出还是继续下一步？
 			if args.timeoutexit {

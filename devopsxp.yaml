@@ -13,7 +13,7 @@ roles: # 执行具体stage
 timeout: 30 # 每个config超时时间，默认60秒，单位：秒
 timeoutexit: true # 超时是否退出，默认：true
 # workdir: /tmp/workspace # docker镜像共享目录 默认: ./workspace
-git:
+git: # 全局唯一git代码仓库地址，会被放到共享目录中全局共用
   url: https://github.com/lflxp/helloworld.git
   branch: master
   depth: 1
