@@ -54,5 +54,6 @@
   with_items:
   - pwd
   - ls -l
-  - k6 run test.js
+  - /opt/gopath/bin/k6 run test.js
   terminial: true
+  skip: true

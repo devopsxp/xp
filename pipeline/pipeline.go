@@ -5,8 +5,16 @@ import (
 
 	"github.com/briandowns/spinner"
 	"github.com/devopsxp/xp/plugin"
+	"github.com/google/gops/agent"
 	log "github.com/sirupsen/logrus"
 )
+
+// 性能分析
+func init() {
+	if err := agent.Listen(agent.Options{}); err != nil {
+		log.Fatal(err)
+	}
+}
 
 // Pipeline Config
 type PipeConfig struct {
