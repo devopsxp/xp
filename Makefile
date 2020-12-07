@@ -1,5 +1,5 @@
-playbook:
-	go build && ./xp playbook --config  devopsxp.yaml
+playbook: clean
+	go build && ./xp playbook --config  devopsxp.yaml -d
 
 debug:
 	go build && ./xp playbook -d --config  devopsxp.yaml
@@ -9,6 +9,9 @@ log:
 
 cli:
 	go build && ./xp cli shell 127.0.0.1-88 -u xp -a "hostname" -L count 
+
+image: build
+	./xp cli image -i java:8 -a "-v /tmp:/data -u root -e OK=123" -L count "env|grep OK && java -version && whoami && for i in {1..3};do echo `date`;sleep 1;done"
 
 shell:
 	go build && ./xp cli shell 127.0.0.1 -a "for i in {1..100};do date;sleep 1;done" -u lxp -T
@@ -46,3 +49,4 @@ config:
 clean:
 	rm -rf /tmp/fetch
 	rm -f /tmp/1abc
+	rm -rf workspace

@@ -1,43 +1,59 @@
-- stage: test
-  name: docker image执行测试
-  image: ubuntu
+- stage: image
+  name: "gin-template build"
+  image: golang:1.14-alpine
+  args:
+    - -v ${PWD}:/998 # -v /opt/gopath/pkg/mod:/go/pkg/mod
+    - -e GO111MODULE=on
+    - -e GOPROXY=https://goproxy.cn
   command:
-    - date
-    - pwd
-    - hostname
-  container:
-    Hostname: "hn"
-    User: "root"
-    Image: ubuntu
-    Volumes:
-      "/tmp": "/tmp"
-    WorkingDir: "/"
-    NetworkDisabled: false
-    ExposedPorts:
-      "22/tcp": ""
-    HostConfig: 
-      Binds: "/tmp:/tmp"
-      Memory: 0
-      MemorySwap: 0
-      MemoryReservation: 0
-      KernelMemory: 0
-      CpuShares: 512
-      CpuPeriod: 100000
-      CpuQuota: 50000
-      CpusetCpus: ""
-      CpusetMems: ""
-      IOMaximumBandwidth: 0
-      IOMaximumIOps: 0
-      MemorySwappiness: 60
-      OomKillDisable: false
-      OomScoreAdj: 500
-      PidMode: ""
-      PidsLimit: -1
-      LogConfig:
-        Type: "json-file"
-        Config: ""
+    # - echo "https://mirror.tuna.tsinghua.edu.cn/alpine/v3.4/main/" > /etc/apk/repositories
+    # - apk update && apk add build-base
+    - go version
+    - pwd 
+    - ls -l 
+    - go build
+    - ls -l
+    - for i in {1..10};do echo `date`;sleep 1;done
   tags:
     - 127.0.0.1
-  retry: 10
-  retryWait: 1
+  retry: 3
+  wait: 1
+  skip: false
+
+- stage: image
+  name: 镜像制作
+  image: docker:dind
+  args:
+    - -v /var/run/docker.sock:/var/run/docker.sock
+  command:
+    - ls -l && pwd 
+    - docker info
+    - docker ps
+    - docker images
+    - docker build -f Dockerfile -t gintest .            
+  tags:
+    - 127.0.0.1
+
+- stage: image
+  name: 服务部署
+  image: docker:dind
+  args:
+    - -v /var/run/docker.sock:/var/run/docker.sock
+  command:
+    - ls -l
+    - docker ps
+    - docker stop gin && docker rm gin
+    - docker run -d --name gin -p 8080:8080 gintest
+    - docker ps
+  tags:
+    - 127.0.0.1
+
+- stage: image
+  name: 性能测试
+  shell: "{{.item}}"
+  with_items:
+  - pwd
+  - ls -l
+  - /opt/gopath/bin/k6 run test.js
+  terminial: true
   skip: true

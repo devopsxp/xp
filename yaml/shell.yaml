@@ -25,15 +25,14 @@
   tags:
     - 127.0.0.1
   retry: 10 # 重试次数
-  retryWait: 1 # 重试间隔 单位秒钟
+  wait: 1 # 重试间隔 单位秒钟
+
 - stage: test
-  name: 查看docker信息
+  name: 查看golang信息
   shell: "{{.item}}"
   with_items:
   - systemctl status sshd
-  - docker info
-  - docker images
-  - docker ps
+  - go version 
   retry: 3
   wait: 1
   terminial: false # ssh 是否交互式执行

@@ -36,6 +36,8 @@ xp is my name,but this project is look like ansible-playbook and pipeline togeth
                 * k8s
                 * 网络设备
                 * snmp等
+                * 测试
+                  * k6 run test.js
             * 执行
                 * RPC
                 * RESTFULL
@@ -55,10 +57,10 @@ xp is my name,but this project is look like ansible-playbook and pipeline togeth
   - [ ] 获取环境变量，包括自定义、目标主机基本信息、本地ENV信息等
   - [x] 识别shell_role中shell、copy、template等三级模块
   - [x] go template support
-  - [ ] docker support
+  - [x] docker support
   - [x] systemd support（服务管理）
   - [ ] k8s support
-  - [ ] ssh + docker support
+  - [x] ssh + docker support
   - [x] Hooks钩子函数支撑output plugin输出，目前支持console、email、wechat，todo： phone、sms、elasticsearch、log
   - [x] tags 指定主机执行
   - [x] 动态环境变量(cobra支持)
@@ -67,6 +69,7 @@ xp is my name,but this project is look like ansible-playbook and pipeline togeth
   - [x] include命令，允许导入复杂yaml文件夹的大量引用，类似ansible-playbook roles
   - [x] fetch模块
   - [x] user模块
+  - [x] git模块
   - [ ] group模块
   - [x] copy模块
   - [ ] yum模块
