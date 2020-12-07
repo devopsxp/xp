@@ -1,0 +1,76 @@
+--- # 测试pod containerd启动顺序
+apiVersion: v1
+kind: Pod
+metadata:
+  name: sidecar-starts-first
+spec:
+  initContainers:
+  - name: initc
+    image: centos:7
+    command:
+      - sh 
+      - -c
+      - echo "initc" > /tmp/logs
+      - for i in {1..3};do echo `date` >> /tmp/logs;sleep 1;done
+    volumeMounts:
+      - mountPath: /tmp
+        name: workdir
+  containers:
+    - name: first
+      image: centos:7
+      lifecycle:
+        postStart:
+          exec:
+            command:
+              - sh
+              - -c
+              - echo "first postStart" >> /tmp/logs && for i in {1..3};do echo `date` >> /tmp/logs;sleep 1;done
+      command:
+        - sh 
+        - -c
+        - echo "first app" >> /tmp/logs && for i in {1..3};do echo `date` >> /tmp/logs;sleep 1;done && sleep 360
+      volumeMounts:
+        - mountPath: /tmp
+          name: workdir
+    - name: sidecartest
+      image: centos:7
+      # lifecycle:
+      #   type: Sidecar
+      command:
+        - sh 
+        - -c
+        - echo "sidecar app" >> /tmp/logs && for i in {1..3};do echo `date` >> /tmp/logs;sleep 1;done && sleep 360
+      volumeMounts:
+        - mountPath: /tmp
+          name: workdir
+    - name: second
+      image: centos:7
+      command:
+        - sh 
+        - -c
+        - echo "second" >> /tmp/logs && for i in {1..3};do echo `date` >> /tmp/logs;sleep 1;done && sleep 360
+      volumeMounts:
+        - mountPath: /tmp
+          name: workdir
+  volumes:
+  - name: workdir
+    emptyDir: {}
+
+# =========================执行顺序===========================
+# initc
+# first app
+# Mon Dec 7 18:43:48 UTC 2020
+# first postStart
+# Mon Dec 7 18:43:48 UTC 2020
+# Mon Dec 7 18:43:49 UTC 2020
+# Mon Dec 7 18:43:49 UTC 2020
+# Mon Dec 7 18:43:50 UTC 2020
+# Mon Dec 7 18:43:50 UTC 2020
+# sidecar app
+# Mon Dec 7 18:43:51 UTC 2020
+# second
+# Mon Dec 7 18:43:51 UTC 2020
+# Mon Dec 7 18:43:52 UTC 2020
+# Mon Dec 7 18:43:52 UTC 2020
+# Mon Dec 7 18:43:53 UTC 2020
+# Mon Dec 7 18:43:53 UTC 2020

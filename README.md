@@ -60,6 +60,14 @@ xp is my name,but this project is look like ansible-playbook and pipeline togeth
   - [x] docker support
   - [x] systemd support（服务管理）
   - [ ] k8s support
+    - [ ] [client-go](github.com/lflxp/lflxp-kubectl)
+    - [ ] init containerd
+      - [ ] git clone
+    - [ ] containerd
+      - [ ] lifecycle
+        - [ ] postStart
+        - [ ] type: Sidecar
+      - [ ] 顺序执行
   - [x] ssh + docker support
   - [x] Hooks钩子函数支撑output plugin输出，目前支持console、email、wechat，todo： phone、sms、elasticsearch、log
   - [x] tags 指定主机执行
