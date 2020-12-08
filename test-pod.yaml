@@ -28,7 +28,7 @@ spec:
       command:
         - sh 
         - -c
-        - echo "first app" >> /tmp/logs && for i in {1..3};do echo `date` >> /tmp/logs;sleep 1;done && sleep 360
+        - echo "first app" >> /tmp/logs && for i in {1..3};do echo `date` >> /tmp/logs;sleep 1;done && sleep 10
       volumeMounts:
         - mountPath: /tmp
           name: workdir
@@ -39,7 +39,7 @@ spec:
       command:
         - sh 
         - -c
-        - echo "sidecar app" >> /tmp/logs && for i in {1..3};do echo `date` >> /tmp/logs;sleep 1;done && sleep 360
+        - echo "sidecar app" >> /tmp/logs && for i in {1..3};do echo `date` >> /tmp/logs;sleep 1;done && sleep 10
       volumeMounts:
         - mountPath: /tmp
           name: workdir
@@ -48,10 +48,11 @@ spec:
       command:
         - sh 
         - -c
-        - echo "second" >> /tmp/logs && for i in {1..3};do echo `date` >> /tmp/logs;sleep 1;done && sleep 360
+        - echo "second" >> /tmp/logs && for i in {1..3};do echo `date` >> /tmp/logs;sleep 1;done && sleep 10
       volumeMounts:
         - mountPath: /tmp
           name: workdir
+  restartPolicy: "Never"
   volumes:
   - name: workdir
     emptyDir: {}
