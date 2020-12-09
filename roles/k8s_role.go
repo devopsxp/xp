@@ -186,8 +186,8 @@ func (k *K8sRole) Run() error {
 
 	containers := []apiv1.Container{}
 	// TODO: env from k8srole => EnvVar
-	// TODO: git clone at initContainers
-	// TODO: set share folder to every container
+	// DONE: git clone at initContainers
+	// DONE: set share folder to every container
 	for _, cc := range k.k8s {
 		tmp := apiv1.Container{
 			Name:       cc.name,
