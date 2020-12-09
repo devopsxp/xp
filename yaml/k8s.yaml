@@ -1,5 +1,5 @@
 - stage: k8s
-  name: pod 部署执行测试
+  name: pod-2020
   workspace: /workspace # 恭喜工作目录，使用emptyDir
   git:
     url: https://github.com/devopsxp/xp
@@ -12,17 +12,18 @@
       env:
         GOPROXY: https://goproxy.cn
       command:
-        - pwd
-        - ls -l
-        - echo "one" > ./logs
+        - sh
+        - -c
+        - pwd && ls -l && echo "one" > /workspace/logs && cat /workspace/logs
     - image: centos:7
       name: two
       env:
         GOPROXY: https://goproxy.cn
       command:
-        - pwd
-        - ls -l 
-        - echo "two" > ./logs
+        - sh
+        - -c
+      args:
+        - echo "two" >> /workspace/logs
     - image: centos:7
       name: three
       env:
@@ -31,8 +32,20 @@
         - sh
         - -c
       args:
-        - echo "three" > ./logs
+        - echo "three" >> /workspace/logs && sleep 60
   skip: false
+
+- stage: k8s
+  name: 查看pod list
+  shell: "{{.item}}"
+  with_items:
+  - sleep 3
+  - kubectl logs -f pod-2020 -c git-clone
+  - kubectl get po
+  - sleep 3
+  - kubectl exec -it pod-2020 -c three -- sh -c "pwd && ls -l && cat /workspace/logs"
+  - kubectl delete po pod-2020
+  terminial: true
 
 # kubernetes:
 #   apiVersion: v1 #指定api版本，此值必须在kubectl apiversion中  

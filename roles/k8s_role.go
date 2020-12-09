@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
+	"strings"
 	"time"
 
 	"github.com/devopsxp/xp/pkg/k8s"
@@ -36,11 +37,12 @@ type GitRepo struct {
 
 type K8sRole struct {
 	RoleLC
-	k8s       []K8sBasic // 容器pod组成
-	workspace string     // 共享目录空间
-	repo      GitRepo    // git代码
-	name      string
-	namespace string
+	k8s          []K8sBasic // 容器pod组成
+	workspace    string     // 共享目录空间
+	workspaceRaw string     // 未设置git之前
+	repo         GitRepo    // git代码
+	name         string
+	namespace    string
 }
 
 func (k *K8sRole) Init(args *RoleArgs) error {
@@ -49,13 +51,38 @@ func (k *K8sRole) Init(args *RoleArgs) error {
 		return err
 	}
 
-	// TODO: fixit
-	k.name = "i-d-n"
 	k.repo.url = args.reponame
+	// 获取git信息
+	if g, ok := args.currentConfig["git"]; ok {
+		if url, ok := g.(map[interface{}]interface{})["url"]; ok {
+			k.repo.url = url.(string)
+		} else {
+			k.repo.url = "https://github.com/lflxp/helloworld.git"
+		}
+
+		if user, ok := g.(map[interface{}]interface{})["user"]; ok {
+			k.repo.user = user.(string)
+		}
+
+		if pwd, ok := g.(map[interface{}]interface{})["pwd"]; ok {
+			k.repo.pwd = pwd.(string)
+		}
+	} else {
+		k.repo.url = "https://github.com/lflxp/helloworld.git"
+	}
+
+	// 获取name
+	if na, ok := args.currentConfig["name"]; ok {
+		k.name = na.(string)
+	} else {
+		k.name = fmt.Sprintf("unknow-%s", time.Now().Format("200601021504"))
+	}
 
 	// 获取workspace
 	if ws, ok := args.currentConfig["workspace"]; ok {
-		k.workspace = ws.(string)
+		tmpUrl := strings.Split(strings.ReplaceAll(k.repo.url, ".git", ""), "/")
+		k.workspace = fmt.Sprintf("%s/%s", ws.(string), tmpUrl[len(tmpUrl)-1])
+		k.workspaceRaw = ws.(string)
 	} else {
 		k.workspace = "/workspace"
 	}
@@ -128,6 +155,24 @@ func (k *K8sRole) Run() error {
 			Namespace:    k.namespace,
 		},
 		Spec: apiv1.PodSpec{
+			InitContainers: []apiv1.Container{
+				apiv1.Container{
+					Name:       "git-clone",
+					Image:      "centos:7",
+					WorkingDir: k.workspaceRaw,
+					Command: []string{
+						"sh",
+						"-c",
+						"yum install -y git && git clone " + k.repo.url,
+					},
+					VolumeMounts: []apiv1.VolumeMount{
+						apiv1.VolumeMount{
+							Name:      "workdir",
+							MountPath: "/workspace",
+						},
+					},
+				},
+			},
 			Volumes: []apiv1.Volume{
 				apiv1.Volume{
 					Name: "workdir",
@@ -141,12 +186,15 @@ func (k *K8sRole) Run() error {
 
 	containers := []apiv1.Container{}
 	// TODO: env from k8srole => EnvVar
+	// TODO: git clone at initContainers
+	// TODO: set share folder to every container
 	for _, cc := range k.k8s {
 		tmp := apiv1.Container{
-			Name:    cc.name,
-			Image:   cc.image,
-			Command: cc.command,
-			Args:    cc.args,
+			Name:       cc.name,
+			Image:      cc.image,
+			Command:    cc.command,
+			Args:       cc.args,
+			WorkingDir: k.workspace,
 			VolumeMounts: []apiv1.VolumeMount{
 				apiv1.VolumeMount{
 					Name:      "workdir",
