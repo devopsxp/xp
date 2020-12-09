@@ -10,6 +10,7 @@ roles: # 执行具体stage
   - build
   - test
   - image
+  - k8s
 timeout: 30 # 每个config超时时间，默认60秒，单位：秒
 timeoutexit: true # 超时是否退出，默认：true
 # workdir: /tmp/workspace # docker镜像共享目录 默认: ./workspace

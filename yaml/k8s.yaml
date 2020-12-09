@@ -5,6 +5,7 @@
     url: https://github.com/devopsxp/xp
     user: root
     pwd: system
+  namespace: default
   k8s:
     - image: centos:7
       name: one

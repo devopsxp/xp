@@ -15,6 +15,10 @@ var clientSet *kubernetes.Clientset
 var initErr error
 var configShare *rest.Config
 
+func init() {
+	InitClientSet()
+}
+
 type KubeConfig struct {
 	Config string
 }
