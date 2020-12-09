@@ -1,6 +1,8 @@
 package k8s
 
 import (
+	"context"
+
 	apiv1 "k8s.io/api/batch/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -11,7 +13,7 @@ func GetJobList(namespace string) (*apiv1.JobList, error) {
 		return nil, err
 	}
 
-	config, err := cli.BatchV1().Jobs(namespace).List(metav1.ListOptions{})
+	config, err := cli.BatchV1().Jobs(namespace).List(context.TODO(), metav1.ListOptions{})
 	return config, err
 }
 
@@ -25,7 +27,7 @@ func GetJobListByLabels(namespace, label string) (*apiv1.JobList, error) {
 		LabelSelector: label,
 	}
 
-	config, err := cli.BatchV1().Jobs(namespace).List(listoptions)
+	config, err := cli.BatchV1().Jobs(namespace).List(context.TODO(), listoptions)
 	return config, err
 }
 
@@ -35,7 +37,7 @@ func GetJobByName(namespace, name string) (*apiv1.Job, error) {
 		return nil, err
 	}
 
-	config, err := cli.BatchV1().Jobs(namespace).Get(name, metav1.GetOptions{})
+	config, err := cli.BatchV1().Jobs(namespace).Get(context.TODO(), name, metav1.GetOptions{})
 	return config, err
 }
 
@@ -45,7 +47,7 @@ func DeleteJob(namespace, name string) error {
 		return err
 	}
 
-	err = cli.BatchV1().Jobs(namespace).Delete(name, &metav1.DeleteOptions{})
+	err = cli.BatchV1().Jobs(namespace).Delete(context.TODO(), name, metav1.DeleteOptions{})
 	return err
 }
 

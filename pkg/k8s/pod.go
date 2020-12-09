@@ -2,6 +2,7 @@ package k8s
 
 import (
 	"bytes"
+	"context"
 	"io"
 
 	apiv1 "k8s.io/api/core/v1"
@@ -14,7 +15,7 @@ func GetPodList() (*apiv1.PodList, error) {
 		return nil, err
 	}
 
-	config, err := cli.CoreV1().Pods("").List(metav1.ListOptions{})
+	config, err := cli.CoreV1().Pods("").List(context.TODO(), metav1.ListOptions{})
 	return config, err
 }
 
@@ -24,7 +25,7 @@ func GetPodListByNamespace(namespace string) (*apiv1.PodList, error) {
 		return nil, err
 	}
 
-	config, err := cli.CoreV1().Pods(namespace).List(metav1.ListOptions{})
+	config, err := cli.CoreV1().Pods(namespace).List(context.TODO(), metav1.ListOptions{})
 	return config, err
 }
 
@@ -38,7 +39,7 @@ func GetPodListByLabels(namespace, label string) (*apiv1.PodList, error) {
 		LabelSelector: label,
 	}
 
-	config, err := cli.CoreV1().Pods(namespace).List(listoptions)
+	config, err := cli.CoreV1().Pods(namespace).List(context.TODO(), listoptions)
 	return config, err
 }
 
@@ -46,11 +47,11 @@ func GetPodListByLabels(namespace, label string) (*apiv1.PodList, error) {
 func CreatePod(pod *apiv1.Pod) (*apiv1.Pod, error) {
 	cli, err := GetClientSet()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	pod, err := cli.CoreV1().Pods(pod.ObjectMeta.Namespace).Create(pod)
-	return pod, err
+	podCallBack, err := cli.CoreV1().Pods(pod.ObjectMeta.Namespace).Create(context.TODO(), pod, metav1.CreateOptions{})
+	return podCallBack, err
 }
 
 func GetPodByName(namespace, name string) (*apiv1.Pod, error) {
@@ -59,7 +60,7 @@ func GetPodByName(namespace, name string) (*apiv1.Pod, error) {
 		return nil, err
 	}
 
-	config, err := cli.CoreV1().Pods(namespace).Get(name, metav1.GetOptions{})
+	config, err := cli.CoreV1().Pods(namespace).Get(context.TODO(), name, metav1.GetOptions{})
 	return config, err
 }
 
@@ -69,7 +70,7 @@ func DeletePod(namespace, name string) error {
 		return err
 	}
 
-	err = cli.CoreV1().Pods(namespace).Delete(name, &metav1.DeleteOptions{})
+	err = cli.CoreV1().Pods(namespace).Delete(context.TODO(), name, metav1.DeleteOptions{})
 	return err
 }
 
@@ -89,7 +90,7 @@ func GetPodLogByPodId(namespace, podid string) (string, error) {
 		TailLines: f(1000),
 	}
 	req := cli.CoreV1().Pods(namespace).GetLogs(podid, &options)
-	readCloser, err := req.Stream()
+	readCloser, err := req.Stream(context.TODO())
 	if err != nil {
 		return result, err
 	}
@@ -119,7 +120,7 @@ func GetPodLogByPodIdByNum(namespace, podid string, num int64) (string, error) {
 		SinceSeconds: f(num),
 	}
 	req := cli.CoreV1().Pods(namespace).GetLogs(podid, &options)
-	readCloser, err := req.Stream()
+	readCloser, err := req.Stream(context.TODO())
 	if err != nil {
 		return result, err
 	}
@@ -145,7 +146,7 @@ func GetPodLogByPodIdAll(namespace, podid string) (string, error) {
 		Follow: false,
 	}
 	req := cli.CoreV1().Pods(namespace).GetLogs(podid, &options)
-	readCloser, err := req.Stream()
+	readCloser, err := req.Stream(context.TODO())
 	if err != nil {
 		return result, err
 	}

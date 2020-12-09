@@ -1,6 +1,7 @@
 package k8s
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"strconv"
@@ -19,7 +20,7 @@ func GetServiceList() (*apiv1.ServiceList, error) {
 		return nil, err
 	}
 
-	config, err := cli.CoreV1().Services("").List(metav1.ListOptions{})
+	config, err := cli.CoreV1().Services("").List(context.TODO(), metav1.ListOptions{})
 	return config, err
 }
 
@@ -29,7 +30,7 @@ func GetServiceListByNamespace(namespace string) (*apiv1.ServiceList, error) {
 		return nil, err
 	}
 
-	config, err := cli.CoreV1().Services(namespace).List(metav1.ListOptions{})
+	config, err := cli.CoreV1().Services(namespace).List(context.TODO(), metav1.ListOptions{})
 	return config, err
 }
 
@@ -39,7 +40,7 @@ func GetServiceByName(namespace, name string) (*apiv1.Service, error) {
 		return nil, err
 	}
 
-	config, err := cli.CoreV1().Services(namespace).Get(name, metav1.GetOptions{})
+	config, err := cli.CoreV1().Services(namespace).Get(context.TODO(), name, metav1.GetOptions{})
 	return config, err
 }
 
@@ -49,7 +50,7 @@ func DeleteService(namespace, name string) error {
 		return err
 	}
 
-	err = cli.CoreV1().Services(namespace).Delete(name, &metav1.DeleteOptions{})
+	err = cli.CoreV1().Services(namespace).Delete(context.TODO(), name, metav1.DeleteOptions{})
 	return err
 }
 
@@ -148,7 +149,7 @@ func CreateService(info *models.Service) (*apiv1.Service, error) {
 		tmp.Status.LoadBalancer.Ingress = []apiv1.LoadBalancerIngress{loadingress}
 	}
 
-	data, err := cli.CoreV1().Services(info.Namespace).Create(tmp)
+	data, err := cli.CoreV1().Services(info.Namespace).Create(context.TODO(), tmp, metav1.CreateOptions{})
 	return data, err
 }
 
@@ -158,7 +159,7 @@ func PatchServicePort(info *models.Service) (*apiv1.Service, error) {
 		return nil, err
 	}
 
-	origin, err := cli.CoreV1().Services(info.Namespace).Get(info.Name, metav1.GetOptions{})
+	origin, err := cli.CoreV1().Services(info.Namespace).Get(context.TODO(), info.Name, metav1.GetOptions{})
 	if err != nil {
 		return origin, err
 	}
@@ -262,6 +263,6 @@ func PatchServicePort(info *models.Service) (*apiv1.Service, error) {
 		return nil, err
 	}
 
-	final, err := cli.CoreV1().Services(info.Namespace).Patch(info.Name, types.JSONPatchType, pb)
+	final, err := cli.CoreV1().Services(info.Namespace).Patch(context.TODO(), info.Name, types.JSONPatchType, pb, metav1.PatchOptions{})
 	return final, err
 }
