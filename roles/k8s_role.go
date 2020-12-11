@@ -51,6 +51,9 @@ func (k *K8sRole) Init(args *RoleArgs) error {
 		return err
 	}
 
+	// 设置hook做自动删除pod处理
+	k.hook.isHook = true
+
 	k.repo.url = args.reponame
 	// 获取git信息
 	if g, ok := args.currentConfig["git"]; ok {
@@ -232,4 +235,16 @@ func (k *K8sRole) After() {
 	stoptime := time.Now()
 	k.logs["耗时"] = fmt.Sprintf("%v", stoptime.Sub(k.starttime))
 	k.msg.CallBack[fmt.Sprintf("%s-%s-%s", k.host, k.stage, k.name)] = k.logs
+}
+
+// hook钩子 进行pod删除
+func (k *K8sRole) Hooks() error {
+	log.Debugf("K8s Role module on %s => %s", k.namespace, k.name)
+	// err := k8s.DeletePod(k.namespace, k.name)
+	// log.WithFields(log.Fields{
+	// 	"耗时": time.Now().Sub(k.starttime),
+	// }).Infof("******************************************************** K8S Role Hook: 删除Pod: %s Namespace: %s  [%s By %s@%s ], Result: %v \n", k.name, k.namespace, k.stage, k.remote_user, k.host, err)
+	k.msg.Data.Check["namespace"] = k.namespace
+	k.msg.Data.Check["pod"] = k.name
+	return nil
 }

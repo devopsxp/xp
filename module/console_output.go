@@ -3,6 +3,7 @@ package module
 import (
 	"reflect"
 
+	"github.com/devopsxp/xp/pkg/k8s"
 	. "github.com/devopsxp/xp/plugin"
 	log "github.com/sirupsen/logrus"
 )
@@ -42,6 +43,13 @@ func (c *ConsoleOutput) Send(msgs *Message) {
 			for _, types := range sendtypes.([]interface{}) {
 				if t, ok := types.(map[interface{}]interface{})["type"]; ok {
 					switch t.(string) {
+					case "k8shook":
+						NewHookAdapter(nil).SetType("console").Send(msgs)
+						log.Infof("清理 Namespace: %s Pod: %s", msgs.Data.Check["namespace"], msgs.Data.Check["name"])
+						err := k8s.DeletePod(msgs.Data.Check["namespace"], msgs.Data.Check["name"])
+						if err != nil {
+							log.Error(err)
+						}
 					case "count":
 						NewHookAdapter(nil).SetType("count").Send(msgs)
 					case "console":
