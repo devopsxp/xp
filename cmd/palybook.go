@@ -34,7 +34,7 @@ var playbookCmd = &cobra.Command{
 		config := pipeline.DefaultPipeConfig("shell").
 			WithInputName("localyaml").
 			WithFilterName("shell").
-			WithOutputName("k8shook")
+			WithOutputName("console")
 
 		p := pipeline.Of(*config)
 		p.Init()

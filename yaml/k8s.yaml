@@ -44,7 +44,7 @@
   - kubectl get po
   - sleep 3
   - kubectl exec -it pod-2020 -c three -- sh -c "pwd && ls -l && cat /workspace/logs"
-  - kubectl delete po pod-2020
+  # - kubectl delete po pod-2020
   terminial: true
 
 # kubernetes:

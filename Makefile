@@ -1,5 +1,5 @@
 playbook: clean
-	go build && ./xp playbook --config  devopsxp.yaml -d
+	go build && ./xp playbook --config  devopsxp.yaml
 
 debug:
 	go build && ./xp playbook -d --config  devopsxp.yaml

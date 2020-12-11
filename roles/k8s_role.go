@@ -218,7 +218,7 @@ func (k *K8sRole) Run() error {
 		return err
 	}
 
-	info, err := json.Marshal(podinfo)
+	info, err := json.MarshalIndent(podinfo, "", "\t")
 	if err != nil {
 		log.Error(err)
 		return err
@@ -245,6 +245,6 @@ func (k *K8sRole) Hooks() error {
 	// 	"耗时": time.Now().Sub(k.starttime),
 	// }).Infof("******************************************************** K8S Role Hook: 删除Pod: %s Namespace: %s  [%s By %s@%s ], Result: %v \n", k.name, k.namespace, k.stage, k.remote_user, k.host, err)
 	k.msg.Data.Check["namespace"] = k.namespace
-	k.msg.Data.Check["pod"] = k.name
+	k.msg.Data.Check["name"] = k.name
 	return nil
 }

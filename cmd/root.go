@@ -73,7 +73,7 @@ func init() {
 	rootCmd.PersistentFlags().StringVarP(&cliUser, "user", "u", "root", "远程主机执行用户，默认：root")
 	rootCmd.PersistentFlags().StringVarP(&cliPwd, "pwd", "p", "", "远程主机用户密码，默认：")
 	rootCmd.PersistentFlags().IntVarP(&cliPort, "port", "P", 22, "远程主机ssh端口，默认：22")
-	rootCmd.PersistentFlags().StringVarP(&cliLogout, "logout", "L", "count", "日志格式：console|none|email|wechat|count")
+	rootCmd.PersistentFlags().StringVarP(&cliLogout, "logout", "L", "count", "日志格式：console|none|email|wechat|count|k8shook")
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.

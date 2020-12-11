@@ -44,11 +44,15 @@ func (c *ConsoleOutput) Send(msgs *Message) {
 				if t, ok := types.(map[interface{}]interface{})["type"]; ok {
 					switch t.(string) {
 					case "k8shook":
-						NewHookAdapter(nil).SetType("console").Send(msgs)
-						log.Infof("清理 Namespace: %s Pod: %s", msgs.Data.Check["namespace"], msgs.Data.Check["name"])
-						err := k8s.DeletePod(msgs.Data.Check["namespace"], msgs.Data.Check["name"])
-						if err != nil {
-							log.Error(err)
+						NewHookAdapter(nil).SetType("count").Send(msgs)
+						if ns, ok := msgs.Data.Check["namespace"]; ok {
+							if name, ok := msgs.Data.Check["name"]; ok {
+								log.Infof("Pipeline Success,清理 Namespace: %s Pod: %s", ns, name)
+								err := k8s.DeletePod(ns, name)
+								if err != nil {
+									log.Error(err)
+								}
+							}
 						}
 					case "count":
 						NewHookAdapter(nil).SetType("count").Send(msgs)
