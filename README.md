@@ -76,8 +76,8 @@ xp is my name,but this project is look like ansible-playbook and pipeline togeth
         - [ ] postStart
         - [ ] type: Sidecar
       - [x] 顺序执行
-    - [ ] 自动Delete Complete Pod
-      - [ ] pipeline hooks调用k8s api进行删除
+    - [x] 自动Delete Complete Pod
+      - [x] pipeline hooks+output plugin调用k8s api进行删除
   - [x] ssh + docker support
   - [x] Hooks钩子函数支撑output plugin输出，目前支持console、email、wechat，todo： phone、sms、elasticsearch、log
   - [x] tags 指定主机执行
