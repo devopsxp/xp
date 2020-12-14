@@ -33,19 +33,24 @@
         - -c
       args:
         - echo "three" >> /workspace/logs && sleep 60
+    - image: centos:7
+      name: checkout
+      command:
+        - sh
+        - -c
+      args:
+        - pwd && ls -l && cat /workspace/logs 
   skip: false
 
 - stage: k8s
   name: 查看pod list
   shell: "{{.item}}"
   with_items:
-  - sleep 3
-  - kubectl logs -f pod-2020 -c git-clone
-  - kubectl get po
-  - sleep 3
-  - kubectl exec -it pod-2020 -c three -- sh -c "pwd && ls -l && cat /workspace/logs"
-  # - kubectl delete po pod-2020
+  - for x in {1..10};do kubectl get po;sleep 1;done
+  - kubectl logs -f pod-2020 -c checkout 
+  # - kubectl exec -it pod-2020 -c three -- sh -c "pwd && ls -l && cat /workspace/logs"
   terminial: true
+  ignore: true
 
 # kubernetes:
 #   apiVersion: v1 #指定api版本，此值必须在kubectl apiversion中  

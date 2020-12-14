@@ -45,12 +45,12 @@ func (c *ConsoleOutput) Send(msgs *Message) {
 					switch t.(string) {
 					case "k8shook":
 						NewHookAdapter(nil).SetType("count").Send(msgs)
-						if ns, ok := msgs.Data.Check["namespace"]; ok {
-							if name, ok := msgs.Data.Check["name"]; ok {
+						if ns, ok := msgs.Tmp["namespace"]; ok {
+							if name, ok := msgs.Tmp["name"]; ok {
 								log.Infof("Pipeline Success,清理 Namespace: %s Pod: %s", ns, name)
 								err := k8s.DeletePod(ns, name)
 								if err != nil {
-									log.Error(err)
+									log.Errorf("Pipeline 清理失败， Namespace： %s Pod: %s %s", ns, name, err.Error())
 								}
 							}
 						}

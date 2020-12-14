@@ -244,7 +244,7 @@ func (k *K8sRole) Hooks() error {
 	// log.WithFields(log.Fields{
 	// 	"耗时": time.Now().Sub(k.starttime),
 	// }).Infof("******************************************************** K8S Role Hook: 删除Pod: %s Namespace: %s  [%s By %s@%s ], Result: %v \n", k.name, k.namespace, k.stage, k.remote_user, k.host, err)
-	k.msg.Data.Check["namespace"] = k.namespace
-	k.msg.Data.Check["name"] = k.name
+	k.msg.Tmp["namespace"] = k.namespace
+	k.msg.Tmp["name"] = k.name
 	return nil
 }

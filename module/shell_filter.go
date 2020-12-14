@@ -215,7 +215,8 @@ func (s *ShellFilter) Process(msgs *Message) *Message {
 					err := roles.NewShellRole(roles.NewRoleArgs(stage.(string), remote_user, remote_pwd, host, workdir, reponame, vars, configs, msgs, nil, remote_port, timeout, timeoutexit))
 					if err != nil {
 						log.Debugln(err.Error())
-						os.Exit(1)
+						// os.Exit(1)
+						break
 					}
 				}
 			}

@@ -16,6 +16,7 @@ type Message struct {
 	Status   StatusType
 	CallBack map[string]map[string]string // 执行返回结果
 	Count    map[string]map[string]int    // 统计执行情况
+	Tmp      map[string]string            // 临时变量
 }
 
 type Env struct {
@@ -57,6 +58,7 @@ func (b *builder) WithInit(failed int) *builder {
 		b.msg.CallBack = make(map[string]map[string]string)
 		b.msg.Data.Items = make(map[string]interface{})
 		b.msg.Count = make(map[string]map[string]int)
+		b.msg.Tmp = make(map[string]string)
 	})
 	return b
 }
