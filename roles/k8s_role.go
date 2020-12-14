@@ -161,12 +161,12 @@ func (k *K8sRole) Run() error {
 			InitContainers: []apiv1.Container{
 				apiv1.Container{
 					Name:       "git-clone",
-					Image:      "centos:7",
+					Image:      "docker:git",
 					WorkingDir: k.workspaceRaw,
 					Command: []string{
 						"sh",
 						"-c",
-						"yum install -y git && git clone " + k.repo.url,
+						"git clone " + k.repo.url,
 					},
 					VolumeMounts: []apiv1.VolumeMount{
 						apiv1.VolumeMount{

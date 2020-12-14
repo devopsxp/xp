@@ -1,7 +1,7 @@
 host: # 目标主机
   - 127.0.0.1
   # - 192.168.0.1-20
-remote_user: lxp # 不设置默认用root用户
+remote_user: xp # 不设置默认用root用户
 remote_pwd: "" # 不设置pwd 则默认用ssh key登录
 remote_port: 22 # 不设置默认走22端口
 roles: # 执行具体stage
