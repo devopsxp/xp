@@ -22,3 +22,19 @@
 1. 保存
 2. 记录
 3. 下载
+
+[C/S模式]
+
+1. RPC Agent改造
+2. 日志Call_Back机制
+    1）logs call back to server
+    2) logs call back to es
+    3) logs call back to kafka
+    4) logs call back to logstash
+
+[frontend]
+
+1. pipeline yaml记录
+2. 日志展示
+3. 实时日志+pipeline显示（drone）
+4. pipeline执行记录展示

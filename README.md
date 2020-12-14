@@ -115,6 +115,28 @@ xp is my name,but this project is look like ansible-playbook and pipeline togeth
   - [ ] jenkins
   - [ ] 安全扫描
   - [ ] ArgoCD
+- [ ] 改造计划
+  - [ ] 微服务改造
+    - [ ] RPC AGENT
+    - [ ] RPC Server
+  - [ ] CRD改造
+    - [ ] 声明式任务流水线执行
+  - [ ] 日志Call Back机制
+    - [ ] back to server
+    - [ ] back to es 
+    - [ ] back to kafka
+    - [ ] back to logstash
+    - [ ] back to Fluentd/Filebeat
+- [ ] 前端页面
+  - [ ] 多租户
+  - [ ] pipeline yaml管理
+  - [ ] pipeline执行历史管理
+  - [ ] 权限管理
+  - [ ] CMDB
+  - [ ] CI/CD管理
+  - [ ] pipeline 可视化
+  - [ ] git源代码管理
+  - [ ] devops工具链对接
 - [ ] 容器化
   - [ ] docker support
     - [x] yaml新增images字段
