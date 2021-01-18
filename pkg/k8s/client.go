@@ -15,6 +15,7 @@ var clientSet *kubernetes.Clientset
 var initErr error
 var configShare *rest.Config
 
+// 初始化k8s client实例
 func init() {
 	InitClientSet()
 }
@@ -30,6 +31,7 @@ func newKubeConfig() *KubeConfig {
 	}
 }
 
+// 兼容k8s inner Cluster 和 Outter Cluster client实例
 func InitClientSet() {
 	kube := newKubeConfig()
 	// clientSet, initErr = kube.GetClientSet()
@@ -40,10 +42,12 @@ func InitClientSet() {
 	}
 }
 
+// 返回k8s client实例和初始化错误信息
 func GetClientSet() (*kubernetes.Clientset, error) {
 	return clientSet, initErr
 }
 
+// k8s集群内部client
 func (this *KubeConfig) GetClientSetInner() (*kubernetes.Clientset, error) {
 	config, err := rest.InClusterConfig()
 	if err != nil {
@@ -58,6 +62,7 @@ func (this *KubeConfig) GetClientSetInner() (*kubernetes.Clientset, error) {
 	return clientset, nil
 }
 
+// k8s config实例初始化方法
 func (this *KubeConfig) GetClientSet() (*kubernetes.Clientset, error) {
 	config, err := clientcmd.BuildConfigFromFlags("", this.Config)
 	if err != nil {

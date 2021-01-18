@@ -7,6 +7,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+// 获取deployment列表
 func GetDeploymentList() (*v1.DeploymentList, error) {
 	cli, err := GetClientSet()
 	if err != nil {
