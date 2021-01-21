@@ -81,6 +81,8 @@ xp is my name,but this project is look like ansible-playbook and pipeline togeth
   - [x] ssh + docker support
   - [x] Hooks钩子函数支撑output plugin输出，目前支持console、email、wechat，todo： phone、sms、elasticsearch、log
   - [x] tags 指定主机执行
+  - [x] when 判断条件，不满足则不执行
+  - [ ] register 注册执行结果，供下一步stage作为条件判断
   - [x] 动态环境变量(cobra支持)
   - [x] with_items迭代器
   - [x] 缓存中间产物

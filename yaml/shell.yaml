@@ -4,6 +4,9 @@
 - stage: what
   name: 非stage测试
   shell: whoami
+  when:
+    key: hostname
+    value: hello
 - stage: build
   name: 获取go version
   shell: go version
