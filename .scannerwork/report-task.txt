@@ -1,0 +1,6 @@
+projectKey=xp
+serverUrl=http://10.113.73.43:9900
+serverVersion=8.6.0.39681
+dashboardUrl=http://10.113.73.43:9900/dashboard?id=xp
+ceTaskId=AXd_vYZxcJIt0uRDVwK9
+ceTaskUrl=http://10.113.73.43:9900/api/ce/task?id=AXd_vYZxcJIt0uRDVwK9
