@@ -408,6 +408,10 @@ COMMITINFO: <font color="comment">{{.info}}</font>
 {{end}}
 ```
 
+# CI
+
+> docker run --rm -v $(pwd):/usr/src sonarsource/sonar-scanner-cli
+
 # TODO 
 
 1. cli+module+shell
