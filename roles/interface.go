@@ -44,22 +44,22 @@ type Hook struct {
 
 // Role生命周期 公共父类
 type RoleLC struct {
-	name  string // 名称
-	types string
+	name  string `json:"name"` // 名称
+	types string `json:"types"`
 	// 通用字段
-	stage       string
-	remote_user string                 // 执行用户
-	remote_pwd  string                 // 执行用户密码（非必须）
-	remote_port int                    // ssh端口
-	vars        map[string]interface{} // 环境变量
-	host        string                 // 执行的目标机
-	starttime   time.Time              // 计算执行时间之开始时间
-	hook        *Hook
+	stage       string                 `json:"stage"`
+	remote_user string                 `json:"remote_user"` // 执行用户
+	remote_pwd  string                 `json:"remote_pwd"`  // 执行用户密码（非必须）
+	remote_port int                    `json:"remote_port"` // ssh端口
+	vars        map[string]interface{} `json:"vars"`        // 环境变量
+	host        string                 `json:"host"`        // 执行的目标机
+	starttime   time.Time              `json:"starttime"`   // 计算执行时间之开始时间
+	hook        *Hook                  `json:"hook"`
 	// 上下文
-	msg       *Message
-	logs      map[string]string // 命令执行日志
-	terminial bool              // ssh 是否交互式执行
-	args      *RoleArgs
+	msg       *Message          `json:"msg"`
+	logs      map[string]string `json:"logs"`      // 命令执行日志
+	terminial bool              `json:"terminial"` // ssh 是否交互式执行
+	args      *RoleArgs         `json:"args"`
 }
 
 // common 公共初始化函数
