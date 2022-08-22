@@ -109,20 +109,20 @@ hooks: # 消息发送 全局一个 可以一次发送所有结果到多个渠道
 stage: # 注册的可执行流程步骤
   - build 
 config: # 详细配置信息
-  - include: ./yaml/user.yaml
-    name: user测试
-  - include: ./yaml/shell.yaml
-    name: shell测试
-  - include: ./yaml/copy.yaml
-    name: copy测试
+  # - include: ./yaml/user.yaml
+  #   name: user测试
+  # - include: ./yaml/shell.yaml
+  #   name: shell测试
+  # - include: ./yaml/copy.yaml
+  #   name: copy测试
   - include: ./yaml/image.yaml
     name: image测试
-  - include: ./yaml/template.yaml
-    name: template测试
-  - include: ./yaml/systemd.yaml
-    name: systemd测试
-  - include: ./yaml/k8s.yaml
-    name: k8s pipeline测试
+  # - include: ./yaml/template.yaml
+  #   name: template测试
+  # - include: ./yaml/systemd.yaml
+  #   name: systemd测试
+  # - include: ./yaml/k8s.yaml
+  #   name: k8s pipeline测试
   - stage: test
     name: Demo测试
     shell: echo 'This is Demo Test!'
