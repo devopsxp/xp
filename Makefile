@@ -50,3 +50,6 @@ clean:
 	rm -rf /tmp/fetch
 	rm -f /tmp/1abc
 	rm -rf workspace
+
+release:
+	goreleaser release
