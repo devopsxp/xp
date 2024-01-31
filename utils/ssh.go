@@ -12,7 +12,6 @@ import (
 	"time"
 
 	"github.com/mitchellh/go-homedir"
-	"github.com/pingcap/log"
 	"github.com/pkg/sftp"
 	"golang.org/x/crypto/ssh"
 	"golang.org/x/crypto/ssh/terminal"
@@ -179,7 +178,7 @@ func (c *Cli) SftpUploadToRemote(localpath, remotepath string) error {
 		n, err := srcFile.Read(buffer)
 		if err != nil {
 			if err == io.EOF {
-				log.Debug("已读取到文件末尾")
+				slog.Debug("已读取到文件末尾")
 				break
 			} else {
 				slog.Debug(fmt.Sprintf("读取文件出错 %v", err))

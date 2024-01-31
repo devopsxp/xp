@@ -11,7 +11,6 @@ import (
 	"github.com/devopsxp/xp/plugin"
 	"github.com/devopsxp/xp/roles"
 	"github.com/devopsxp/xp/utils"
-	"github.com/pingcap/log"
 	uuid "github.com/satori/go.uuid"
 )
 
@@ -109,7 +108,7 @@ func (s *ShellFilter) Process(msgs *plugin.Message) *plugin.Message {
 		timeoutexit = true
 	}
 
-	log.Info("******************************************************** Prepare [DockerWorkspace : 镜像工作空间设置] ")
+	slog.Info("******************************************************** Prepare [DockerWorkspace : 镜像工作空间设置] ")
 	pipelineUuid = uuid.NewV4().String()
 
 	// docker共享空间
