@@ -5,7 +5,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+	http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,8 +16,9 @@ limitations under the License.
 package cmd
 
 import (
+	"log/slog"
+
 	"github.com/devopsxp/xp/pipeline"
-	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -27,7 +28,7 @@ var playbookCmd = &cobra.Command{
 	Short: "开发测试模块",
 	Long:  `测试ansile-playbook功能和pipeline流程管控`,
 	Run: func(cmd *cobra.Command, args []string) {
-		log.Debugln("playbook called")
+		slog.Debug("playbook called")
 		// fmt.Printf("%v %v\n", viper.GetStringSlice("stage"), viper.AllSettings())
 
 		// 根据yaml解析shell等模块，进行动态匹配，进行顺序执行

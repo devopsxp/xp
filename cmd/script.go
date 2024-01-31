@@ -5,7 +5,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+	http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,10 +16,11 @@ limitations under the License.
 package cmd
 
 import (
+	"fmt"
+	"log/slog"
 	"os"
 
 	"github.com/devopsxp/xp/pipeline"
-	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -31,12 +32,12 @@ var scriptCmd = &cobra.Command{
 	Short: "远程执行脚本",
 	Long:  `eg: ./xp cli script 127.0.0.1 -a "test.sh"`,
 	Run: func(cmd *cobra.Command, args []string) {
-		log.Debugf("Cli args: %v", args)
+		slog.Debug(fmt.Sprintf("Cli args: %v", args))
 		if script == "" {
-			log.Error("未指定需要执行的脚本路径")
+			slog.Error("未指定需要执行的脚本路径")
 			os.Exit(1)
 		} else if len(args) == 0 {
-			log.Error("未检测到目标主机，请确认！ [eg: ./xp cli script 127.0.0.1-20 -a test.sh]")
+			slog.Error("未检测到目标主机，请确认！ [eg: ./xp cli script 127.0.0.1-20 -a test.sh]")
 			os.Exit(1)
 		}
 

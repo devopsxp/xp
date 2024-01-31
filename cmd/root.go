@@ -5,7 +5,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+	http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,15 +16,12 @@ limitations under the License.
 package cmd
 
 import (
-	"fmt"
+	"log/slog"
 	"os"
-	"time"
 
 	"github.com/spf13/cobra"
 
 	_ "github.com/devopsxp/xp/module"
-	"github.com/devopsxp/xp/utils"
-	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
 
@@ -55,7 +52,7 @@ to quickly create a Cobra application.`,
 // This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
-		log.Errorln(err)
+		slog.Error(err.Error())
 		os.Exit(1)
 	}
 }
@@ -82,40 +79,6 @@ func init() {
 
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
-	customFormatter := new(log.TextFormatter)
-	customFormatter.TimestampFormat = "2006-01-02 15:04:05"
-	// Log as JSON instead of the default ASCII formatter.
-	log.SetFormatter(customFormatter)
-	customFormatter.FullTimestamp = true // 显示时间
-	// customFormatter.ForceQuote = true // 强制格式匹配
-	// customFormatter.PadLevelText = true // 显示完整日志级别
-
-	// Output to stdout instead of the default stderr
-	// Can be any io.Writer, see below for File example
-	if islog {
-		file, err := os.OpenFile(fmt.Sprintf("%s.log", time.Now().Format("20060102150405")), os.O_WRONLY|os.O_APPEND|os.O_CREATE|os.O_SYNC, 0600)
-		if err != nil {
-			panic(err)
-		}
-
-		info, err := file.Stat()
-		if err != nil {
-			panic(err)
-		}
-
-		fileWriter := utils.LogFileWriter{file, info.Size()}
-		log.SetOutput(fileWriter)
-	} else {
-		log.SetOutput(os.Stdout)
-	}
-
-	//  log format setting
-	if debug {
-		log.SetLevel(log.DebugLevel)
-	} else {
-		log.SetLevel(log.InfoLevel)
-	}
-
 	if cfgFile != "" {
 		// Use config file from the flag.
 		viper.SetConfigFile(cfgFile)
@@ -136,8 +99,8 @@ func initConfig() {
 
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {
-		log.Debugln("Using config file:", viper.ConfigFileUsed())
+		slog.Debug("Using config file:", viper.ConfigFileUsed())
 	} else {
-		log.Errorf("Using config file error: %s\n", err.Error())
+		slog.Error("Using config file error", "ERROR", err.Error())
 	}
 }

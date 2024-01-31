@@ -5,7 +5,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+	http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,10 +16,11 @@ limitations under the License.
 package cmd
 
 import (
+	"fmt"
+	"log/slog"
 	"os"
 
 	"github.com/devopsxp/xp/pipeline"
-	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -35,9 +36,9 @@ var imageCmd = &cobra.Command{
 	Short: "基于docker容器进行命令执行",
 	Long:  `本机docker执行pipeline命令`,
 	Run: func(cmd *cobra.Command, args []string) {
-		log.Debugf("Cli args: %v", args)
+		slog.Debug(fmt.Sprintf("Cli args: %v", args))
 		if imageIE == "" {
-			log.Error("未检测到执行命令,请确认！ [eg: ./xp cli image -i java:8 -a \"-v /tmp:/data -u root \" java -version && for i in {1..10};do echo `date`;sleep 1;done]")
+			slog.Error("未检测到执行命令,请确认！ [eg: ./xp cli image -i java:8 -a \"-v /tmp:/data -u root \" java -version && for i in {1..10};do echo `date`;sleep 1;done]")
 			os.Exit(1)
 		}
 

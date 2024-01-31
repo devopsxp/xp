@@ -5,7 +5,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+	http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,11 +16,12 @@ limitations under the License.
 package cmd
 
 import (
+	"fmt"
+	"log/slog"
 	"os"
 	"strings"
 
 	"github.com/devopsxp/xp/pipeline"
-	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -37,13 +38,13 @@ var copyCmd = &cobra.Command{
 	Long: `将src文件传输到远程目标主机dest路径，
 eg: ./xp cli copy 127.0.0.1 -u lxp -S /tmp/123 -D /tmp/333`,
 	Run: func(cmd *cobra.Command, args []string) {
-		log.Debugf("Cli args: %v", args)
+		slog.Debug(fmt.Sprintf("Cli args: %v", args))
 		if cliSrc == "" || cliDest == "" {
-			log.Error("src or dest is not config")
+			slog.Error("src or dest is not config")
 			os.Exit(1)
 		}
 
-		log.Debugln("items", cliItem)
+		slog.Debug("items", cliItem)
 		var items []interface{}
 
 		if cliItem != "" {

@@ -5,7 +5,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+	http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,10 +16,11 @@ limitations under the License.
 package cmd
 
 import (
+	"fmt"
+	"log/slog"
 	"os"
 
 	"github.com/devopsxp/xp/pipeline"
-	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -34,12 +35,12 @@ var shellCmd = &cobra.Command{
 	Short: "执行远程命令",
 	Long:  `example: ./xp cli shell 127.0.0.1-20 192.168.50.1-10 -a "zsh" -T -L console`,
 	Run: func(cmd *cobra.Command, args []string) {
-		log.Debugf("Cli args: %v", args)
+		slog.Debug(fmt.Sprintf("Cli args: %v", args))
 		if cliShell == "" {
-			log.Error("未检测到执行命令,请确认！ [eg: ./xp cli shell 127.0.0.1-20 -a \"hostname\"]")
+			slog.Error("未检测到执行命令,请确认！ [eg: ./xp cli shell 127.0.0.1-20 -a \"hostname\"]")
 			os.Exit(1)
 		} else if len(args) == 0 {
-			log.Error("未检测到目标主机，请确认！ [eg: ./xp cli shell 127.0.0.1-20 -a \"hostname\"]")
+			slog.Error("未检测到目标主机，请确认！ [eg: ./xp cli shell 127.0.0.1-20 -a \"hostname\"]")
 			os.Exit(1)
 		}
 		// TODO: 完成数据Message.Data模型拼装
